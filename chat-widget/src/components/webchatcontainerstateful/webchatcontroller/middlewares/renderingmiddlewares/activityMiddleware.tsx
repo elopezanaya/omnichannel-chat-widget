@@ -98,6 +98,9 @@ export const createActivityMiddleware = (systemMessageStyleProps?: React.CSSProp
             }
 
             const userMessageStyles = { ...defaultUserMessageStyles, ...userMessageStyleProps };
+            //console.log("ELOPEZANAYA card -> "  + JSON.stringify(card));
+            //     console.log("ELOPEZANAYA styles -> "  + JSON.stringify(userMessageStyles));
+
             // eslint-disable-next-line react/display-name, @typescript-eslint/no-explicit-any
             return (...renderArgs: any) => (
                 <div
