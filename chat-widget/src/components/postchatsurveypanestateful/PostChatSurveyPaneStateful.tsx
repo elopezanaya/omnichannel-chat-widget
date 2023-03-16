@@ -18,10 +18,8 @@ import { CustomerVoiceEvents } from "./enums/CustomerVoiceEvents";
 export const PostChatSurveyPaneStateful = (props: IPostChatSurveyPaneStatefulProps) => {
     const [state]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();
     const postChatSurveyMode = state.domainStates.liveChatConfig?.LiveWSAndLiveChatEngJoin?.msdyn_postconversationsurveymode;
-
     const generalStyleProps: IStyle = Object.assign({}, defaultGeneralPostChatSurveyPaneStyleProps, props.styleProps?.generalStyleProps,
         {display: state.appStates.isMinimized ? "none" : ""});
-
     let surveyInviteLink = "";
     if (state.domainStates.postChatContext.surveyInviteLink) {
         surveyInviteLink = state.domainStates.postChatContext.surveyInviteLink + "&embed=" + (postChatSurveyMode === PostChatSurveyMode.Embed).toString() + 
