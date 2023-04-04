@@ -1,13 +1,20 @@
 import { ILiveChatWidgetLocalizedTexts } from "../../../../contexts/common/ILiveChatWidgetLocalizedTexts";
 
+/* 
+MIDDLEWARE_BANNER_FILE parameters:
+{0} = File limit size
+{1} = File extension
+{2} = File name 
+*/
+
 export const defaultMiddlewareLocalizedTexts: ILiveChatWidgetLocalizedTexts = {
     MIDDLEWARE_BANNER_FILE_NULL_ERROR: "There was an error uploading the file, please try again.",
-    MIDDLEWARE_BANNER_FILE_SIZE_WITHOUT_EXTENSION_ERROR: "File exceeds the allowed limit of {0} MB and please upload the file with an appropriate file extension.",
-    MIDDLEWARE_BANNER_FILE_SIZE_EXTENSION_ERROR: "File exceeds the allowed limit of {0} MB and {1} files are not supported.",
-    MIDDLEWARE_BANNER_FILE_WITHOUT_EXTENSION: "File upload error. Please upload the file with an appropriate file extension.",
-    MIDDLEWARE_BANNER_FILE_EXTENSION_ERROR: "{0} files are not supported.",
-    MIDDLEWARE_BANNER_FILE_SIZE_ERROR: "File exceeds the allowed limit of {0} MB.",
-    MIDDLEWARE_BANNER_FILE_IS_EMPTY_ERROR: "This file can't be attached because it's empty. Please try again with a different file.",
+    MIDDLEWARE_BANNER_FILE_SIZE_WITHOUT_EXTENSION_ERROR: "File {2} exceeds the allowed limit of {0} MB and please upload the file with an appropriate file extension.",
+    MIDDLEWARE_BANNER_FILE_SIZE_EXTENSION_ERROR: "File {2} exceeds the allowed limit of {0} MB and {1} files are not supported.",
+    MIDDLEWARE_BANNER_FILE_WITHOUT_EXTENSION: "File upload error. Please upload the file {2} with an appropriate file extension.",
+    MIDDLEWARE_BANNER_FILE_EXTENSION_ERROR: "{1} files are not supported.",
+    MIDDLEWARE_BANNER_FILE_SIZE_ERROR: "File {2} exceeds the allowed limit of {0} MB.",
+    MIDDLEWARE_BANNER_FILE_IS_EMPTY_ERROR: "This file {2} can't be attached because it's empty. Please try again with a different file.",
     MIDDLEWARE_BANNER_ERROR_MESSAGE: "Upload failed, please try again.",
     MIDDLEWARE_BANNER_INTERNET_BACK_ONLINE: "You’re back online.",
     MIDDLEWARE_BANNER_NO_INTERNET_CONNECTION: "Unable to connect—please check your internet connection.",
@@ -18,5 +25,6 @@ export const defaultMiddlewareLocalizedTexts: ILiveChatWidgetLocalizedTexts = {
     MIDDLEWARE_MESSAGE_SENDING: "Sending ...",
     MIDDLEWARE_MESSAGE_DELIVERED: "Sent",
     MIDDLEWARE_MESSAGE_NOT_DELIVERED: "Not Delivered",
-    MIDDLEWARE_MESSAGE_RETRY: "Retry"
+    MIDDLEWARE_MESSAGE_RETRY: "Retry",
+    MIDDLEWARE_BANNER_CHAT_DISCONNECT: "Your conversation has been disconnected. For additional assistance, please start a new chat."
 };

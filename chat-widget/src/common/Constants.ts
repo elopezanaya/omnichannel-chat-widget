@@ -124,6 +124,9 @@ export class Constants {
     public static readonly PostChatLoadingDurationInMs = 2000;
     public static readonly BrowserUnloadConfirmationMessage = "Do you want to leave chat?";
     public static readonly CacheTtlInMinutes = 15;
+
+    // Visibility timeout for conversation details
+    public static readonly LWICheckOnVisibilityTimeout = 3 * 60 * 1000; // 3 minute
 }
 
 export const Regex = class {
@@ -183,6 +186,12 @@ export class WebChatMiddlewareConstants {
     public static readonly timeBetweenTimestampGroups = 300000; //5 minutes
     public static readonly maxTextLength = 6000;
     public static readonly adaptiveCard = "AdaptiveCard";
+}
+
+export class AMSConstants {
+    public static readonly supportedImagesMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/heic", "image/webp"];
+    public static readonly maxSupportedImageSize = 20; // AMS max file limit outside of supported Images MIME Types.
+    public static readonly maxSupportedFileSize = 300; // AMS max size limit.
 }
 
 export class MimeTypes {
