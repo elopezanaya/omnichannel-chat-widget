@@ -55,6 +55,14 @@ export const PreChatSurveyPaneStateful = (props: IPreChatSurveyPaneStatefulParam
     };
 
     const requiredFieldMissingMessage = props.surveyProps?.controlProps?.requiredFieldMissingMessage ?? defaultPreChatSurveyLocalizedTexts.PRECHAT_REQUIRED_FIELD_MISSING_MESSAGE;
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    const onSuccessVerifyResponse = (response?: any) => {
+        console.log("ELOPEZANAYA onSuccessVerifyResponse");
+        console.log(response);
+        initStartChat(null);
+    };
+
     const controlProps: IPreChatSurveyPaneControlProps = {
         id: "oc-lcw-prechatsurvey-pane",
         dir: state.domainStates.globalDir,
@@ -160,7 +168,9 @@ export const PreChatSurveyPaneStateful = (props: IPreChatSurveyPaneStatefulParam
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 grecaptcha.render("html_element", {
-                    sitekey: "6LfDSRooAAAAADcVF9Levr7nWB2qMba3XMVD6n2J"
+                    sitekey: "SITEKEY",
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+                    callback: onSuccessVerifyResponse
                 });
             } else {
                 console.error("Error: grecaptcha is not defined or render function is not available.");
@@ -170,12 +180,11 @@ export const PreChatSurveyPaneStateful = (props: IPreChatSurveyPaneStatefulParam
     }, []);
 
     return (
+
         <>
-            <div id="recaptachaId" style={{width:"100%", height:"100%"}}>
+            <div id="recaptachaId" style={{ width: "100%", height: "100%" }}>
                 <form action="?" method="POST">
-                    <div id="html_element"></div>
-                    <br />
-                    <input type="submit" value="Submit" />
+                    <div id="html_element" style={{position:"absolute", top:"50%", left:"50%", transform:"translate(-50%, -50%)"}}></div>
                 </form>
             </div>
         </>
