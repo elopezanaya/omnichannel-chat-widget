@@ -11,6 +11,7 @@ import { IPreChatSurveyPaneStatefulParams } from "./interfaces/IPreChatSurveyPan
 import { IPreChatSurveyPaneStyleProps } from "@microsoft/omnichannel-chat-components/lib/types/components/prechatsurveypane/interfaces/IPreChatSurveyPaneStyleProps";
 import { IStyle } from "@fluentui/react";
 import { LiveChatWidgetActionType } from "../../contexts/common/LiveChatWidgetActionType";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PreChatSurveyPane } from "@microsoft/omnichannel-chat-components";
 import StartChatOptionalParams from "@microsoft/omnichannel-chat-sdk/lib/core/StartChatOptionalParams";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
@@ -102,6 +103,7 @@ export const PreChatSurveyPaneStateful = (props: IPreChatSurveyPaneStatefulParam
         ...surveyProps?.controlProps
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const styleProps: IPreChatSurveyPaneStyleProps = {
         ...surveyProps?.styleProps,
         generalStyleProps: generalStyleProps
@@ -143,10 +145,40 @@ export const PreChatSurveyPaneStateful = (props: IPreChatSurveyPaneStatefulParam
         TelemetryHelper.logLoadingEvent(LogLevel.INFO, { Event: TelemetryEvent.PrechatSurveyLoaded });
     }, []);
 
+    useEffect(() => {
+        const initializeRecaptcha = () => {
+            console.log("ELOPEZANAYA LOADING ELEMENT");
+            // Now, grecaptcha should be available
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            if (typeof grecaptcha !== "undefined" && typeof grecaptcha.render === "function") {
+
+                console.log("grecaptcha -11");
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                console.log(grecaptcha);
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                grecaptcha.render("html_element", {
+                    sitekey: "6LfDSRooAAAAADcVF9Levr7nWB2qMba3XMVD6n2J"
+                });
+            } else {
+                console.error("Error: grecaptcha is not defined or render function is not available.");
+            }
+        };
+        initializeRecaptcha();
+    }, []);
+
     return (
-        <PreChatSurveyPane
-            controlProps={controlProps}
-            styleProps={styleProps} />
+        <>
+            <div id="recaptachaId" style={{width:"100%", height:"100%"}}>
+                <form action="?" method="POST">
+                    <div id="html_element"></div>
+                    <br />
+                    <input type="submit" value="Submit" />
+                </form>
+            </div>
+        </>
     );
 };
 
