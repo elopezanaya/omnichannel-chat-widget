@@ -11,6 +11,7 @@ export const defaultInitializeInMemoryDataStore = (widgetId: string) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         window.addEventListener("message", function (e: any) {
             try {
+                console.log("ISRAEL :" + Date.now() + " :: " + JSON.stringify(e.data));
                 if (e.data.key) {
                     const browserData = e.data;
                     if (defaultCacheManager.InternalCache[browserData.key]) {
@@ -35,6 +36,7 @@ export const defaultInitializeInMemoryDataStore = (widgetId: string) => {
 };
 
 export const inMemoryDataStore = () => {
+
     const dataStoreProvider = {
         getData: (key: string) => {
             if (defaultCacheManager.InternalCache && defaultCacheManager.InternalCache[key]) {

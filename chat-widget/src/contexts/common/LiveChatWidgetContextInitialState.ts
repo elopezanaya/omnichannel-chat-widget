@@ -5,7 +5,7 @@ import { defaultMiddlewareLocalizedTexts } from "../../components/webchatcontain
 import { getWidgetCacheIdfromProps, isNullOrUndefined } from "../../common/utils";
 import { defaultClientDataStoreProvider } from "../../common/storage/default/defaultClientDataStoreProvider";
 import { ConfirmationState, Constants, ConversationEndEntity, StorageType } from "../../common/Constants";
-import { inMemoryDataStore } from "../../common/storage/default/defaultInMemoryDataStore";
+import { BroadcastService } from "@microsoft/omnichannel-chat-components";
 
 export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps) => {
 
@@ -16,6 +16,28 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
     let initialState;
 
     try {
+        
+        console.log("ELOPEZANAYA :: WITHOUT_PROPS  :: 20");
+        BroadcastService.getMessageByEventName("internal:isAliveResponse").subscribe((event) => {
+            console.log("ELOPEZANAYA : is alive response", JSON.stringify(event));
+        
+        });
+
+
+
+        BroadcastService.postMessage({
+            eventName: "internal:isAlive",
+            payload: null
+        });
+
+
+
+    } catch (error) {
+        console.error("ELOPEZANAYA : error", error);
+        
+    }
+
+    /*try {
         if (alternateStorage?.useExternalStorage && alternateStorage?.cachedData) {
             initialState = alternateStorage.cachedData;
             // lets save the value in the in-memory cache
@@ -28,12 +50,21 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
     } catch (e) {
         initialState = null;
         console.error("Error while getting initial state from cache", e);
+    }*/
+
+
+    if (!initialState) {
+        initialState = defaultClientDataStoreProvider(cacheTtlInMins, storageType, alternateStorage?.useExternalStorage || false).getData(widgetCacheId);
     }
 
     if (!isNullOrUndefined(initialState)) {
+        console.log("ELOPEZANAYA : initialState => "+ Date.now() + ":: " +  JSON.stringify(initialState) );
+
         const initialStateFromCache: ILiveChatWidgetContext = JSON.parse(initialState);
+        console.log("ELOPEZANAYA : initialStateFromCache => "+ Date.now() + ":: " +  JSON.stringify(initialStateFromCache) );
+
         return initialStateFromCache;
-    }
+    }else{ console.log("ELOPEZANAYA :EMPTY  initialState => "+ Date.now()  );}
 
     const LiveChatWidgetContextInitialState: ILiveChatWidgetContext = {
         domainStates: {

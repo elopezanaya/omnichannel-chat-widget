@@ -64,6 +64,8 @@ export const defaultClientDataStoreProvider = (cacheTtlinMins = 0, storageType: 
                     });
                 }
             } else {
+
+                console.log("ELOPEZANAYA : InMemoroy : setData => " , Date.now() + " :: " +JSON.stringify(data) );
                 const now = new Date();
 
                 const dataToCache = {
@@ -104,17 +106,20 @@ export const defaultClientDataStoreProvider = (cacheTtlinMins = 0, storageType: 
             } else {
                 
                 const result = inMemoryDataStore().getData(key);
+                console.log("ELOPEZANAYA : InMemoroy : result => " , Date.now() + " :: " +JSON.stringify(result) );
                 let itemInJson = undefined;
                 if (result !== null && result !== undefined) {
                     itemInJson = JSON.parse(result);
-                    const now = new Date();
+                    //const now = new Date();
                     // compare the expiry time of the item with the current time
-                    if (now.getTime() > itemInJson.expiry) {
+                    console.log("ELOPEZANAYA : InMemoroy : itemInJson.expiry => " , Date.now() + " :: " +JSON.stringify(itemInJson.expiry) );
+                    
+                    /*if (now.getTime() > itemInJson.expiry) {
                         // If the item is expired, delete the item from storage
                         // and return null
-                        localStorage.removeItem(key);
+                        inMemoryDataStore().removeData(key);
                         return null;
-                    }
+                    }*/
                     return itemInJson.data;
                 }
                 return itemInJson;
