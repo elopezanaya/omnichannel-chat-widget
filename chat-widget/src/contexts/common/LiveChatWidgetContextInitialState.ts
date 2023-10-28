@@ -2,19 +2,20 @@ import { ConversationState } from "./ConversationState";
 import { ILiveChatWidgetContext } from "./ILiveChatWidgetContext";
 import { ILiveChatWidgetProps } from "../../components/livechatwidget/interfaces/ILiveChatWidgetProps";
 import { defaultMiddlewareLocalizedTexts } from "../../components/webchatcontainerstateful/common/defaultProps/defaultMiddlewareLocalizedTexts";
-import { getWidgetCacheIdfromProps, isNullOrUndefined } from "../../common/utils";
+import { getWidgetCacheIdfromProps } from "../../common/utils";
 import { defaultClientDataStoreProvider } from "../../common/storage/default/defaultClientDataStoreProvider";
 import { ConfirmationState, Constants, ConversationEndEntity, StorageType } from "../../common/Constants";
 import { inMemoryDataStore } from "../../common/storage/default/defaultInMemoryDataStore";
 
 export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps) => {
 
+    console.log("ELOPEZANAYA :: GET CONTEXT :: 3");
+
     const widgetCacheId = getWidgetCacheIdfromProps(props);
     const cacheTtlInMins = props?.controlProps?.cacheTtlInMins ?? Constants.CacheTtlInMinutes;
     const storageType = props?.useSessionStorage === true ? StorageType.sessionStorage : StorageType.localStorage;
     const alternateStorage = props?.liveChatWidgetExternalStorage;
     let initialState;
-
     try {
         if (alternateStorage?.useExternalStorage && alternateStorage?.cachedData) {
             initialState = alternateStorage.cachedData;
@@ -30,10 +31,13 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
         console.error("Error while getting initial state from cache", e);
     }
 
-    if (!isNullOrUndefined(initialState)) {
-        const initialStateFromCache: ILiveChatWidgetContext = JSON.parse(initialState);
+    const initialStateFromCache: ILiveChatWidgetContext = JSON.parse(initialState);
+
+    console.log("ELOPEZANAYA :: GET CONTEXT :: initialStateFromCache ::", JSON.stringify(initialStateFromCache));
+    /*if (!isNullOrUndefined(initialState)) {
+       
         return initialStateFromCache;
-    }
+    }*/
 
     const LiveChatWidgetContextInitialState: ILiveChatWidgetContext = {
         domainStates: {
@@ -46,7 +50,7 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
             postChatContext: undefined,
             telemetryInternalData: {},
             globalDir: "ltr",
-            liveChatContext: undefined,
+            liveChatContext: initialStateFromCache,
             customContext: undefined,
             widgetSize: undefined,
             widgetInstanceId: "",
