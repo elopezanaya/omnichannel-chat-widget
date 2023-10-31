@@ -290,6 +290,7 @@ export const getWidgetCacheId = (orgId: string, widgetId: string, widgetInstance
         widgetInstanceId = widgetInstanceId + Constants.PopoutCacheSuffix;
     }
     const widgetCacheId = `${widgetInstanceId}_${orgId}_${widgetId}`;
+    console.log("ELOPEZANAYA :: getWidgetCacheId :: widgetCacheId ::", widgetCacheId);
     return Md5.init(widgetCacheId);
 };
 
@@ -355,6 +356,7 @@ export const getWidgetCacheIdfromProps = (props: any, popoutChat = false): strin
         popoutChat = true;
     }
     const widgetCacheId = getWidgetCacheId(orgId, widgetId, widgetInstanceId, popoutChat);
+    console.log("ELOPEZANAYA :: getWidgetCacheIdfromProps :: widgetCacheId ::", widgetCacheId);
     return widgetCacheId;
 };
 

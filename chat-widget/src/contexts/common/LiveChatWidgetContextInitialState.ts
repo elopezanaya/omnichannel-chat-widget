@@ -2,23 +2,62 @@ import { ConversationState } from "./ConversationState";
 import { ILiveChatWidgetContext } from "./ILiveChatWidgetContext";
 import { ILiveChatWidgetProps } from "../../components/livechatwidget/interfaces/ILiveChatWidgetProps";
 import { defaultMiddlewareLocalizedTexts } from "../../components/webchatcontainerstateful/common/defaultProps/defaultMiddlewareLocalizedTexts";
-import { getWidgetCacheIdfromProps } from "../../common/utils";
+import { getWidgetCacheIdfromProps, isNullOrUndefined } from "../../common/utils";
 import { defaultClientDataStoreProvider } from "../../common/storage/default/defaultClientDataStoreProvider";
 import { ConfirmationState, Constants, ConversationEndEntity, StorageType } from "../../common/Constants";
 import { inMemoryDataStore } from "../../common/storage/default/defaultInMemoryDataStore";
 
 export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps) => {
 
-    console.log("ELOPEZANAYA :: GET CONTEXT :: 3");
-
     const widgetCacheId = getWidgetCacheIdfromProps(props);
     const cacheTtlInMins = props?.controlProps?.cacheTtlInMins ?? Constants.CacheTtlInMinutes;
     const storageType = props?.useSessionStorage === true ? StorageType.sessionStorage : StorageType.localStorage;
     const alternateStorage = props?.liveChatWidgetExternalStorage;
-    let initialState;
+    const cacheton = alternateStorage?.cachedData;
+    let initialState = null;
+
+
+    console.log("ELOPEZANAYA :: 15 :: get_context: alternateStorage.cachedData=> ", JSON.stringify(cacheton));
+    cacheton["domainStates"]["liveChatConfig"] = props.chatConfig;
+    cacheton["domainStates"]["renderingMiddlewareProps"] = props.webChatContainerProps?.renderingMiddlewareProps;
+    cacheton["domainStates"]["middlewareLocalizedTexts"] = defaultMiddlewareLocalizedTexts;
+
+    if (alternateStorage?.useExternalStorage && alternateStorage?.cachedData) {
+
+        //validate components are present before to build the context
+
+        if (
+            !isEmptyObject(alternateStorage?.cachedData?.domainStates) &&
+            !isEmptyObject(alternateStorage?.cachedData?.appStates) &&
+            !isEmptyObject(alternateStorage?.cachedData?.uiStates)) {
+
+            const initialStateFromCache: ILiveChatWidgetContext = {
+                "domainStates": alternateStorage?.cachedData?.domainStates,
+                "appStates": alternateStorage?.cachedData?.appStates,
+                "uiStates": alternateStorage?.cachedData?.uiStates
+            };
+
+            inMemoryDataStore().setData(widgetCacheId, initialStateFromCache);
+            console.log("ELOPEZANAYA :: get_context: Formed props => ", JSON.stringify(initialStateFromCache));
+            return initialStateFromCache;
+        }
+    }
+
+
     try {
+        initialState = defaultClientDataStoreProvider(cacheTtlInMins, storageType, false).getData(widgetCacheId);
+    } catch (e) {
+        initialState = null;
+        console.error("Error while getting initial state from cache", e);
+    }
+
+
+
+
+    /* try {
         if (alternateStorage?.useExternalStorage && alternateStorage?.cachedData) {
             initialState = alternateStorage.cachedData;
+            console.log("ELOPEZANAYA :: get_context: alternateStorage.cachedData=> ", JSON.stringify(initialState));
             // lets save the value in the in-memory cache
             if (initialState){
                 inMemoryDataStore().setData(widgetCacheId, initialState);
@@ -27,17 +66,13 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
             initialState = defaultClientDataStoreProvider(cacheTtlInMins, storageType, false).getData(widgetCacheId);
         }
     } catch (e) {
-        initialState = null;
-        console.error("Error while getting initial state from cache", e);
-    }
 
-    const initialStateFromCache: ILiveChatWidgetContext = JSON.parse(initialState);
-
-    console.log("ELOPEZANAYA :: GET CONTEXT :: initialStateFromCache ::", JSON.stringify(initialStateFromCache));
-    /*if (!isNullOrUndefined(initialState)) {
-       
-        return initialStateFromCache;
     }*/
+
+    if (!isNullOrUndefined(initialState)) {
+        const initialStateFromCache: ILiveChatWidgetContext = JSON.parse(initialState);
+        return initialStateFromCache;
+    }
 
     const LiveChatWidgetContextInitialState: ILiveChatWidgetContext = {
         domainStates: {
@@ -50,7 +85,7 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
             postChatContext: undefined,
             telemetryInternalData: {},
             globalDir: "ltr",
-            liveChatContext: initialStateFromCache,
+            liveChatContext: undefined,
             customContext: undefined,
             widgetSize: undefined,
             widgetInstanceId: "",
@@ -94,5 +129,21 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
         }
     };
 
+    console.log("ELOPEZANAYA :: get_context: LiveChatWidgetContextInitialState=> ", JSON.stringify(LiveChatWidgetContextInitialState));
     return LiveChatWidgetContextInitialState;
+};
+
+
+// function to check if an object is empty
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isEmptyObject = (obj: any) => {
+    try {
+        if (obj === undefined || obj === null) {
+            return true;
+        }
+        return Object.keys(obj).length === 0;
+    } catch (error) {
+        return true;
+    }
+
 };

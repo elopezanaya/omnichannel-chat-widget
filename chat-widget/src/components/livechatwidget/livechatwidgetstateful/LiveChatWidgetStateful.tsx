@@ -445,7 +445,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     useEffect(() => {
         canStartProactiveChat.current = state.appStates.conversationState === ConversationState.Closed &&
             !state.appStates.proactiveChatStates.proactiveChatInNewWindow;
-    }, [state.appStates.conversationState, state.appStates.proactiveChatStates.proactiveChatInNewWindow]);
+    }, [state.appStates.conversationState, state.appStates?.proactiveChatStates?.proactiveChatInNewWindow]);
 
     // Reset the UnreadMessageCount when minimized is toggled and broadcast it.
     useEffect(() => {

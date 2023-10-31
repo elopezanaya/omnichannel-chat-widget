@@ -55,6 +55,20 @@ export const defaultClientDataStoreProvider = (cacheTtlinMins = 0, storageType: 
                         } else {
                             sessionStorage.setItem(key, strItem);
                         }
+
+                        // de mientras
+                        const dataToCache = {
+                            key: key,
+                            data: data,
+                            expiry: now.getTime() + ttlInMs,
+                        };
+                        //Emit the data to be cached to the external storage
+                        BroadcastService.postMessage({
+                            eventName: BroadcastEvent.ExternalSaveDataRequest,
+                            payload: dataToCache
+                        });
+
+
                     }
                 } catch (error) {
                     TelemetryHelper.logConfigDataEvent(LogLevel.ERROR, {
