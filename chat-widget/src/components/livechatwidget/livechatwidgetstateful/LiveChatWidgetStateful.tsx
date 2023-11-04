@@ -7,7 +7,6 @@ import React, { Dispatch, useEffect, useRef, useState } from "react";
 import { checkIfConversationStillValid, initStartChat, prepareStartChat, setPreChatAndInitiateChat } from "../common/startChat";
 import {
     createTimer,
-    getBroadcastChannelName,
     getConversationDetailsCall,
     getLocaleDirection,
     getStateFromCache,
@@ -105,8 +104,9 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     //Scrollbar styles
     const scrollbarProps: IScrollBarProps = Object.assign({}, defaultScrollBarProps, props?.scrollBarProps);
 
-    const broadcastServiceChannelName = getBroadcastChannelName(chatSDK?.omnichannelConfig?.widgetId, props.controlProps?.widgetInstanceId ?? "");
-    BroadcastServiceInitialize(broadcastServiceChannelName);
+    //const broadcastServiceChannelName = getBroadcastChannelName(chatSDK?.omnichannelConfig?.widgetId, props.controlProps?.widgetInstanceId ?? "");
+    console.log("ELOPEZANAYA :: CHW ::LiveChatWidgetStateful: broadcastServiceChannelName: ");
+    BroadcastServiceInitialize("tacos");
     TelemetryTimers.LcwLoadToChatButtonTimer = createTimer();
 
     const widgetElementId: string = props.controlProps?.id || "oc-lcw";
