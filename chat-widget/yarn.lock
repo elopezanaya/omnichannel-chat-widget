@@ -2241,24 +2241,24 @@
   resolved "https://registry.yarnpkg.com/@microsoft/load-themed-styles/-/load-themed-styles-1.10.295.tgz#d3c8d7ab186f422727ba112d6ebe5fe8e41051d9"
   integrity sha512-W+IzEBw8a6LOOfRJM02dTT7BDZijxm+Z7lhtOAz1+y9vQm1Kdz9jlAO+qCEKsfxtUOmKilW8DIRqFw2aUgKeGg==
 
-"@microsoft/ocsdk@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/ocsdk/-/ocsdk-0.4.0.tgz#f45d9d25a915c49fdf4f55e10fdee787c7a5e203"
-  integrity sha512-8VvbXxyUs+8OfbJRv/IW0VF3lRso0UeaL6NabaBz7+VsXe+qXTGqYv0SfSOzMjG9h6GFFxxM8fYfYCGSu6sIqQ==
+"@microsoft/ocsdk@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@microsoft/ocsdk/-/ocsdk-0.4.2.tgz#7cc9740308b6d24dfeb775844d9f5e5070fa5157"
+  integrity sha512-x2cMpdkKB5psuS6ChE6w9R7TygSeJwXJBJTo8iGD0BEo03JbV85hHJUL7xaV2oBHAvCpwl5CcWUQez1ZnE/3mQ==
   dependencies:
     "@babel/runtime" "^7.15.4"
     "@types/node" "^12.20.26"
-    axios "^0.21.4"
+    axios "^1.6.1"
 
-"@microsoft/omnichannel-amsclient@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@microsoft/omnichannel-amsclient/-/omnichannel-amsclient-0.1.4.tgz#26b8650287bb7bc2a5baa8db47c2371fe9034434"
-  integrity sha512-iLLgQjxqYnXrcAzGrbHFqpRLdTjjadZOySEU32CoR5Had34ug4capBiqP1FYmITmfHO0u9G9oC4N1ghCtqFkNw==
+"@microsoft/omnichannel-amsclient@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@microsoft/omnichannel-amsclient/-/omnichannel-amsclient-0.1.6.tgz#748148bf8167640fd7ca933e80b10ec6eecb5391"
+  integrity sha512-c7DyUsPy364NMb+uXzR6/QddynkAdYrucw2eUgvlslWpg9GyF1Horycs/iqNd+Qn1cBAWXXr639h3N+EPJ9AEA==
 
-"@microsoft/omnichannel-chat-components@^1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@microsoft/omnichannel-chat-components/-/omnichannel-chat-components-1.0.7.tgz#7eca65ee280ef9eb9105c82e528ec13233b1c951"
-  integrity sha512-RPcEpCftQOCoZnPXTyij1qqhBNKpD84+7ICBuKmvtChmv342JTs1Q8utsQi50g7X8h4U0fx5SJUEVnzz8dCIlA==
+"@microsoft/omnichannel-chat-components@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/omnichannel-chat-components/-/omnichannel-chat-components-1.1.0.tgz#f318ee88308b24801706cd1bee86d299d5700afd"
+  integrity sha512-Ka2qVaL4kHxnzsE3gffnXfwoTTZWz0VP+dkx6vT1wN/KcB+aJ3hMP8EiAxIG8rWxnX3OoLC0mguzErd//lyGFw==
   dependencies:
     "@fluentui/react" "^8.46.0"
     adaptivecards "^2.10.0"
@@ -2268,23 +2268,23 @@
     rxjs "^5.0.3"
     styled-components "^5.3.1"
 
-"@microsoft/omnichannel-chat-sdk@1.5.4":
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/@microsoft/omnichannel-chat-sdk/-/omnichannel-chat-sdk-1.5.4.tgz#c497d911f6eccfdf112b43037797b9222b0ffa6c"
-  integrity sha512-TSgEHoHJtxOn3ZKXeG8l85iFKhUk9TNQ1nSh5u+sZMzgJfcHbK1wgapO7dRr4QoSjPr+HiRqPhtwXIuiI6FuPw==
+"@microsoft/omnichannel-chat-sdk@1.6.2":
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/@microsoft/omnichannel-chat-sdk/-/omnichannel-chat-sdk-1.6.2.tgz#f95819a68878598ca08631403d72f03c5218682c"
+  integrity sha512-YDGeagwfIuvJ1c4IEbPdZbs2NaJ5AWix+Rsno1rSzORNEmAAWXD3dxuDiI35OMmBk7A0M36F+4NtH4jB433Hgw==
   dependencies:
     "@azure/communication-chat" "1.1.1"
     "@azure/communication-common" "1.1.0"
-    "@microsoft/ocsdk" "^0.4.0"
-    "@microsoft/omnichannel-amsclient" "^0.1.4"
-    "@microsoft/omnichannel-ic3core" "^0.1.2"
+    "@microsoft/ocsdk" "^0.4.2"
+    "@microsoft/omnichannel-amsclient" "^0.1.6"
+    "@microsoft/omnichannel-ic3core" "^0.1.3"
 
-"@microsoft/omnichannel-ic3core@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@microsoft/omnichannel-ic3core/-/omnichannel-ic3core-0.1.2.tgz#5e97952bd5306ef18654e73cf534ebfee3a0a009"
-  integrity sha512-cDYupP61y2W0kveP6mzYEljkpKE7kK1bPQD8/peCsnETR9GeSlGFt6iRQnfNoxqMHjHC2vsPn2FCCnT7s4m2uw==
+"@microsoft/omnichannel-ic3core@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@microsoft/omnichannel-ic3core/-/omnichannel-ic3core-0.1.3.tgz#5e04a76dbc0d1fda2a949acc5575028f75c5ceae"
+  integrity sha512-eRZfF1Mosn7J3PQaMDMehXcL0Wjg062enbd1YjPzNc+Dt+OqFMV0xcbSo/bEuPudjYRNUqji0ZL9OoqJ1EyKFA==
   dependencies:
-    axios "^0.21.4"
+    axios "^1.6.0"
     buffer "^6.0.3"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
@@ -4920,12 +4920,14 @@ axe-core@^4.2.0:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.6.3.tgz#fc0db6fdb65cc7a80ccf85286d91d64ababa3ece"
   integrity sha512-/BQzOX780JhsxDnPpH4ZiyrJAzcd8AfzFPkv+89veFSr1rcMjuq2JDCwypKaPeB6ljHp9KjXhPpjgCvQlWYuqg==
 
-axios@^0.21.4:
-  version "0.21.4"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
-  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
+axios@^1.6.0, axios@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.1.tgz#76550d644bf0a2d469a01f9244db6753208397d7"
+  integrity sha512-vfBmhDpKafglh0EldBEbVuoe7DyAavGSLWhuSm5ZSEKQnHhBf0xAAwybbNH1IkrJNGnS/VG4I5yxig1pCEXE4g==
   dependencies:
-    follow-redirects "^1.14.0"
+    follow-redirects "^1.15.0"
+    form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
 
 babel-jest@^27.3.1, babel-jest@^27.5.1:
   version "27.5.1"
@@ -8017,7 +8019,7 @@ flux@^4.0.1:
     fbemitter "^3.0.0"
     fbjs "^3.0.1"
 
-follow-redirects@^1.14.0:
+follow-redirects@^1.15.0:
   version "1.15.3"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.3.tgz#fe2f3ef2690afce7e82ed0b44db08165b207123a"
   integrity sha512-1VzOtuEM8pC9SFU1E+8KfTjZyMztRsgEfwQl44z8A25uy13jSzTj6dyK2Df52iV0vgHCfBwLhDWevLn95w5v6Q==

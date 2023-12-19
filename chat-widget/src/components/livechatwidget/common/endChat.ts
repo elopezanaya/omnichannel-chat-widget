@@ -1,7 +1,7 @@
-import { ConfirmationState, Constants, ConversationEndEntity, ParticipantType } from "../../../common/Constants";
+import { ConfirmationState, Constants, ConversationEndEntity, ParticipantType, PrepareEndChatDescriptionConstants } from "../../../common/Constants";
 import { LogLevel, TelemetryEvent } from "../../../common/telemetry/TelemetryConstants";
 import { getAuthClientFunction, handleAuthentication } from "./authHelper";
-import { getConversationDetailsCall, getWidgetEndChatEventName, isNullOrEmptyString } from "../../../common/utils";
+import { getConversationDetailsCall, getWidgetEndChatEventName } from "../../../common/utils";
 import { getPostChatContext, initiatePostChat } from "./renderSurveyHelpers";
 
 import { BroadcastService } from "@microsoft/omnichannel-chat-components";
@@ -14,9 +14,11 @@ import { LiveChatWidgetActionType } from "../../../contexts/common/LiveChatWidge
 import { TelemetryHelper } from "../../../common/telemetry/TelemetryHelper";
 import { WebChatStoreLoader } from "../../webchatcontainerstateful/webchatcontroller/WebChatStoreLoader";
 import { defaultWebChatContainerStatefulProps } from "../../webchatcontainerstateful/common/defaultProps/defaultWebChatContainerStatefulProps";
+import { TelemetryManager } from "../../../common/telemetry/TelemetryManager";
+import { uuidv4 } from "@microsoft/omnichannel-chat-sdk";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const prepareEndChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: ILiveChatWidgetContext, dispatch: Dispatch<ILiveChatWidgetAction>, setAdapter: any, setWebChatStyles: any, adapter: any, uwid: string) => {
+const prepareEndChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: ILiveChatWidgetContext, dispatch: Dispatch<ILiveChatWidgetAction>, setAdapter: any, setWebChatStyles: any, adapter: any) => {
     try {
         // Use Case: If call is ongoing, end the call by simulating end call button click
         endVoiceVideoCallIfOngoing(chatSDK, dispatch);
@@ -27,8 +29,13 @@ const prepareEndChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: 
         if (conversationDetails?.canRenderPostChat?.toLowerCase() === Constants.false) {
             // If ended by customer, just close chat
             if (state?.appStates?.conversationEndedBy === ConversationEndEntity.Customer) {
-                await endChat(props, chatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, false, false, true, uwid);
+                TelemetryHelper.logSDKEvent(LogLevel.INFO, {
+                    Event: TelemetryEvent.PrepareEndChat,
+                    Description: PrepareEndChatDescriptionConstants.ConversationEndedByCustomerWithoutPostChat
+                });
+                await endChat(props, chatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, false, false, true);
             }
+
             // Use Case: If ended by Agent, stay chat in InActive state
             return;
         }
@@ -39,15 +46,17 @@ const prepareEndChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: 
         }
 
         // Use Case: Can render post chat scenarios
-        await getPostChatContext(chatSDK, state, dispatch);
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const postchatContext: any = state?.domainStates?.postChatContext;
+        const postchatContext: any = await getPostChatContext(chatSDK, state, dispatch) ?? state?.domainStates?.postChatContext;
 
         if (postchatContext === undefined) {
             // For Customer intiated conversations, just close chat widget
             if (state?.appStates?.conversationEndedBy === ConversationEndEntity.Customer) {
-                await endChat(props, chatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, false, false, true, uwid);
+                TelemetryHelper.logSDKEvent(LogLevel.INFO, {
+                    Event: TelemetryEvent.PrepareEndChat,
+                    Description: PrepareEndChatDescriptionConstants.ConversationEndedByCustomerWithInvalidPostChat
+                });
+                await endChat(props, chatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, false, false, true);
                 return;
             }
 
@@ -56,15 +65,21 @@ const prepareEndChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: 
             return;
         }
 
-        endChat(props, chatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, false, true, true, uwid);
+        // Log PrepareEndChat if conversation ended by customer (bot and agent cases are handled in LiveChatWidgetStateful.tsx)
+        if (state?.appStates?.conversationEndedBy) {
+            TelemetryHelper.logSDKEvent(LogLevel.INFO, {
+                Event: TelemetryEvent.PrepareEndChat,
+                Description: `${PrepareEndChatDescriptionConstants.ConversationEndedByCustomerWithInvalidPostChat} ${state?.appStates?.conversationEndedBy}.`
+            });
+        }
+        endChat(props, chatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, false, true, true);
 
         // Initiate post chat render
-        if (state?.domainStates?.postChatContext) {
+        if (postchatContext) {
             await initiatePostChat(props, conversationDetails, state, dispatch, postchatContext);
             return;
         }
-    }
-    catch (error) {
+    } catch (error) {
         TelemetryHelper.logActionEvent(LogLevel.ERROR, {
             Event: TelemetryEvent.EndChatFailed,
             ExceptionDetails: {
@@ -74,7 +89,11 @@ const prepareEndChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: 
 
         //Close chat widget for any failure in embedded to allow to show start chat button
         if (props.controlProps?.hideStartChatButton === false) {
-            await endChat(props, chatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, false, false, true, uwid);
+            TelemetryHelper.logSDKEvent(LogLevel.INFO, {
+                Event: TelemetryEvent.PrepareEndChat,
+                Description: PrepareEndChatDescriptionConstants.PrepareEndChatError
+            });
+            await endChat(props, chatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, false, false, true);
         }
     }
     finally {
@@ -85,7 +104,7 @@ const prepareEndChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const endChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: ILiveChatWidgetContext, dispatch: Dispatch<ILiveChatWidgetAction>, setAdapter: any, setWebChatStyles: any, adapter: any,
-    skipEndChatSDK?: boolean, skipCloseChat?: boolean, postMessageToOtherTab?: boolean, uwid = "") => {
+    skipEndChatSDK?: boolean, skipCloseChat?: boolean, postMessageToOtherTab?: boolean) => {
     if (!skipEndChatSDK && chatSDK.conversation) {
         try {
             TelemetryHelper.logSDKEvent(LogLevel.INFO, {
@@ -132,16 +151,18 @@ const endChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: ILiveCh
         }
     }
 
-    if (postMessageToOtherTab && !isNullOrEmptyString(uwid)) {
+    if (postMessageToOtherTab) {
         const endChatEventName = await getEndChatEventName(chatSDK, props);
         BroadcastService.postMessage({
             eventName: endChatEventName,
-            payload: uwid
+            payload: {
+                runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId
+            }
         });
     }
 };
 
-const callingStateCleanUp = async (dispatch: Dispatch<ILiveChatWidgetAction>) => {
+export const callingStateCleanUp = (dispatch: Dispatch<ILiveChatWidgetAction>) => {
     dispatch({ type: LiveChatWidgetActionType.SHOW_CALLING_CONTAINER, payload: false });
     dispatch({ type: LiveChatWidgetActionType.SET_INCOMING_CALL, payload: true });
     dispatch({ type: LiveChatWidgetActionType.DISABLE_VIDEO_CALL, payload: true });
@@ -149,14 +170,14 @@ const callingStateCleanUp = async (dispatch: Dispatch<ILiveChatWidgetAction>) =>
     dispatch({ type: LiveChatWidgetActionType.DISABLE_REMOTE_VIDEO, payload: true });
 };
 
-const endChatStateCleanUp = async (dispatch: Dispatch<ILiveChatWidgetAction>) => {
+export const endChatStateCleanUp = (dispatch: Dispatch<ILiveChatWidgetAction>) => {
     // Need to clear these states immediately when chat ended from OC.
     dispatch({ type: LiveChatWidgetActionType.SET_LIVE_CHAT_CONTEXT, payload: undefined });
     dispatch({ type: LiveChatWidgetActionType.SET_RECONNECT_ID, payload: undefined });
     dispatch({ type: LiveChatWidgetActionType.SET_CHAT_DISCONNECT_EVENT_RECEIVED, payload: false });
 };
 
-const closeChatStateCleanUp = async (dispatch: Dispatch<ILiveChatWidgetAction>) => {
+export const closeChatStateCleanUp = (dispatch: Dispatch<ILiveChatWidgetAction>) => {
     dispatch({ type: LiveChatWidgetActionType.SET_CHAT_TOKEN, payload: undefined });
     // dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_STATE, payload: ConversationState.Closed });
     dispatch({ type: LiveChatWidgetActionType.SET_RECONNECT_ID, payload: undefined });
@@ -171,6 +192,16 @@ const closeChatStateCleanUp = async (dispatch: Dispatch<ILiveChatWidgetAction>) 
             proactiveChatInNewWindow: false
         }
     });
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const chatSDKStateCleanUp = (chatSDK: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (chatSDK as any).requestId = uuidv4();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (chatSDK as any).chatToken = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (chatSDK as any).reconnectId = null;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -222,11 +222,6 @@ export enum ElementType {
     CallingContainerSDK = "CallingContainerSDK"
 }
 
-export enum ChatSDKError {
-    WidgetUseOutsideOperatingHour = "WidgetUseOutsideOperatingHour",
-    AuthContactIdNotFoundFailure = "AuthContactIdNotFoundFailure"
-}
-
 export enum EnvironmentVersion {
     prod = "prod",
     dogfood = "df",
@@ -304,6 +299,16 @@ export class NotificationPaneConstants {
     public static readonly ChromeCloseIconName = "ChromeClose";
 }
 
+export class StartChatErrorPaneConstants {
+    public static readonly DefaultStartChatErrorPaneId = "oc-lcw-start-chat-error-pane";
+    public static readonly DefaultStartChatErrorTitleText = "We are unable to load chat at this time.";
+    public static readonly DefaultStartChatErrorSubtitleText = "Please try again later.";
+    public static readonly DefaultStartChatErrorUnauthorizedTitleText = "Chat authentication has failed.";
+    public static readonly DefaultStartChatErrorAuthSetupErrorTitleText = "Chat authentication has failed.";
+    public static readonly DefaultStartChatErrorUnauthorizedSubtitleText = "UNAUTHORIZED";
+    public static readonly DefaultStartChatErrorAuthSetupErrorSubtitleText = "AUTH SETUP ERROR";
+}
+
 export class AriaTelemetryConstants {
     // Aria Endpoint for different environment types.
     public static readonly GERMANY_ENDPOINT: string = "https://de.pipe.aria.microsoft.com/Collector/3.0/";
@@ -324,4 +329,27 @@ export class AriaTelemetryConstants {
         "crm17.omnichannelengagementhub.com",
         "crm19.omnichannelengagementhub.com"
     ];
+}
+
+export class WidgetLoadTelemetryMessage {
+    public static readonly OOOHMessage = "Widget is OOOH";
+    public static readonly PersistedStateRetrievedMessage = "Persisted state retrieved";
+}
+
+export class WidgetLoadCustomErrorString {
+    public static readonly AuthenticationFailedErrorString = "Authentication was not successful";
+    public static readonly NetworkErrorString = "Network Error";
+}
+
+export class PrepareEndChatDescriptionConstants {
+    public static readonly ConversationEndedByCustomerWithoutPostChat = "Conversation ended by customer. Post chat not configured or should not show.";
+    public static readonly ConversationEndedByCustomerWithInvalidPostChat = "Conversation ended by customer. Post chat context is invalid.";
+    public static readonly ConversationEndedBy = "Conversation ended by";
+    public static readonly PrepareEndChatError = "There's an error while preparing to end chat. Closing chat widget.";
+    public static readonly WidgetLoadFailedAfterSessionInit = "SessionInit was successful, but widget load failed. Ending chat to avoid ghost chats in OC.";
+    public static readonly InitiateEndChatReceived = "Received InitiateEndChat BroadcastEvent while conversation state is not Active. Ending chat.";
+    public static readonly EndChatReceivedFromOtherTabs = "Received EndChat BroadcastEvent from other tabs. Closing this chat.";
+    public static readonly CustomerCloseChatOnFailureOrPostChat = "Customer is trying to close chat widget on start chat failure or post chat pane.";
+    public static readonly CustomerCloseInactiveChat = "Chat was Inactive and customer is trying to close chat widget or refreshing the page.";
+    public static readonly BrowserUnload = "Browser unload event received. Ending chat.";
 }

@@ -188,10 +188,8 @@ Refer to the below table to understand different critical telemetry events raise
 | `ProcessingHTMLTextMiddlewareFailed`     |On HTML Field adding noopener noreferrer failed |
 | `ProcessingSanitizationMiddlewareFailed`     |On HTML Field sanitization failed |
 | `FormatTagsMiddlewareJSONStringifyFailed`     |On ACS Format Message Tags Middleware failed |
-| `IC3ThreadUpdateEventReceived`|On `IC3 ThreadUpdateEvent` Received|
 | `AverageWaitTimeMessageRecieved`|On Average Wait Time system message Received|
 | `QueuePositionMessageRecieved`|On Queue Position system message Received|
-| `IC3ThreadUpdateEventReceived`|On `IC3 ThreadUpdateEvent` Received|
 | `ConversationEndedThreadEventReceived`     |On Conversation ended by agent side or by timeout |
 | `InvalidConfiguration`     |On Invalid data masking regex rule collection |
 | `DataMaskingRuleApplied`     |On data masking regex rule applied |
@@ -275,6 +273,7 @@ Refer to the below table to understand different critical telemetry events raise
 |`CloseChatMethodException`|On failed to end chat from `ConfirmationPane` Confirm button click|
 |`GetChatReconnectContextSDKCallFailed`| On get reconnect context SDK call failed|
 |`GetConversationDetailsCallFailed`|On `PropactiveChatPane` load complete|
+|`PrepareEndChat`|On preparing to call ChatSDK end chat, used to identify end-chat scenarios|
 |`EndChatSDKCall`|On initiating ChatSDK end chat call|
 |`EndChatEventRecevied `| On end chat event received|
 |`EndChatSDKCallFailed`|On ChatSDK end chat failure|

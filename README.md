@@ -23,6 +23,43 @@ Omnichannel Live Chat Widget UI Components offers a re-usable component-based li
 
 For more information about Live Chat Widget, see [here](https://docs.microsoft.com/en-us/dynamics365/customer-service/set-up-chat-widget).
 
+## Releases
+
+New releases are published on a regular basis to ensure the product quality.
+
+### Chat Widget
+| Version | Docs | Release Date | End of Support | Deprecated |
+| -- | -- | -- | -- | -- |
+| 1.5.0 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.5.0) | 2023-11-21 | 2024-11-21 | |
+| 1.4.0 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.4.0) | 2023-10-25 | 2024-10-25 | |
+| 1.3.0 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.3.0) | 2023-09-18 | 2024-09-18 | |
+| 1.2.3 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.2.3) | 2023-09-07 | 2024-09-07 | |
+| 1.2.2 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.2.2) | 2023-08-16 | 2024-08-16 | |
+| 1.2.1 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.2.1) | 2023-07-24 | 2024-07-24 | |
+| 1.2.0 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.2.0) | 2023-07-20 | 2024-07-20 | |
+| 1.1.0 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-06-08 | 2024-06-08 | |
+| 1.0.5 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.0.5) | 2023-05-26 | 2024-05-26 | |
+| 1.0.4 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.0.4) | 2023-05-08 | 2024-05-08 | |
+| 1.0.3 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.0.3) | 2023-04-24 | 2024-04-24 | |
+| 1.0.2 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.0.2) | 2023-04-06 | 2024-04-06 | |
+| 1.0.1 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.0.1) | 2023-03-23 | 2024-03-23 | |
+| 1.0.0 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.0.0) | 2023-03-22 | 2024-03-22 | |
+
+### Chat Components
+| Version | Docs | Release Date | End of Support | Deprecated |
+| -- | -- | -- | -- | -- |
+| 1.1.0 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-12-12 | 2024-12-12 | |
+| 1.0.9 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-12-07 | 2024-12-07 | |
+| 1.0.8 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-10-31 | 2024-10-31 | |
+| 1.0.7 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-09-13 | 2024-09-13 | |
+| 1.0.6 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-08-18 | 2024-08-18 | |
+| 1.0.5 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-07-20 | 2024-07-20 | |
+| 1.0.4 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-06-20 | 2024-06-20 | |
+| 1.0.3 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-06-08 | 2024-06-08 | |
+| 1.0.2 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-06-06 | 2024-06-06 | |
+| 1.0.1 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-04-04 | 2024-04-04 | |
+| 1.0.0 | [Release Notes](https://github.com/microsoft/omnichannel-chat-widget/releases/tag/c-v1.1.0) | 2023-03-15 | 2024-03-15 | |
+
 ## Installation
 
 ```powershell
@@ -127,7 +164,7 @@ These are components that are included in the ```@microsoft/omnichannel-chat-com
 | ProactiveChatSurveyPane | A pane that holds more information than a normal chat button and can be configured to proactively pop up | [IProactiveChatPaneProps](https://github.com/microsoft/omnichannel-chat-widget/blob/main/chat-components/src/components/proactivechatpane/interfaces/IProactiveChatPaneProps.ts) |
 | ReconnectChatPane | The pane that shows up when the customer is re-connecting to the chat to add additional conversation | [IReconnectChatPaneProps](https://github.com/microsoft/omnichannel-chat-widget/blob/main/chat-components/src/components/reconnectchatpane/interfaces/IReconnectChatPaneProps.ts) |
 
-> :warning: Because the components extend Microsoft's [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/) components, the base interface for all the ```styleProps``` in the above table is [IStyle](https://github.com/microsoft/fluentui/blob/master/packages/merge-styles/src/IStyle.ts), which extends the [IRawStyleBase](https://docs.microsoft.com/en-us/javascript/api/merge-styles/irawstylebase?view=office-ui-fabric-react-latest) interface, which is the most useful reference.
+> :warning: Because the components extend Microsoft's [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/) components, the base interface for all the ```styleProps``` in the above table is [IStyle](https://github.com/microsoft/fluentui/blob/master/packages/merge-styles/src/IStyle.ts), which extends the [IRawStyleBase](https://github.com/microsoft/fluentui/blob/master/packages/merge-styles/src/IRawStyleBase.ts#L280) interface, which is the most useful reference.
 
 ### Stateful Components
 

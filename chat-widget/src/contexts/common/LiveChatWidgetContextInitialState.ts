@@ -6,6 +6,7 @@ import { getWidgetCacheIdfromProps, isNullOrUndefined } from "../../common/utils
 import { defaultClientDataStoreProvider } from "../../common/storage/default/defaultClientDataStoreProvider";
 import { ConfirmationState, Constants, ConversationEndEntity, StorageType } from "../../common/Constants";
 import { inMemoryDataStore } from "../../common/storage/default/defaultInMemoryDataStore";
+import { StartChatFailureType } from "./StartChatFailureType";
 
 export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps) => {
 
@@ -92,7 +93,8 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
             initialChatSdkRequestId: "",
             transcriptRequestId: "",
             confirmationPaneConfirmedOptionClicked: false,
-            confirmationState: ConfirmationState.NotSet
+            confirmationState: ConfirmationState.NotSet,
+            startChatFailureType: StartChatFailureType.Generic
         },
         appStates: {
             conversationState: ConversationState.Closed,
@@ -119,6 +121,7 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
         },
         uiStates: {
             showConfirmationPane: false,
+            showStartChatErrorPane: false,
             showEmailTranscriptPane: false,
             showCallingPopup: false,
             isIncomingCall: true,
@@ -132,7 +135,6 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
     console.log("ELOPEZANAYA :: get_context: LiveChatWidgetContextInitialState=> ", JSON.stringify(LiveChatWidgetContextInitialState));
     return LiveChatWidgetContextInitialState;
 };
-
 
 // function to check if an object is empty
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

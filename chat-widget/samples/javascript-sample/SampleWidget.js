@@ -77,13 +77,22 @@ const main = async () => {
         BroadcastService.postMessage(setCustomContextEvent);
     };
 
-    const startProactiveChat = (notificationUIConfig, showPrechat, inNewWindow) => {
+    const endChat = () => {
+        const endChatEvent = {
+            eventName: "InitiateEndChat"
+        };
+        BroadcastService.postMessage(endChatEvent);
+    };
+
+    const startProactiveChat = () => {
         const startProactiveChatEvent = {
             eventName: "StartProactiveChat",
             payload: {
-                bodyTitle: (notificationUIConfig && notificationUIConfig.message) ? notificationUIConfig.message : "Hello Customer",
-                showPrechat: showPrechat,
-                inNewWindow: inNewWindow
+                notificationConfig: {
+                    message: "Hi, how may I help you?" // title text
+                },
+                enablePreChat: true, // enablePreChat
+                inNewWindow: false
             }
         };
         BroadcastService.postMessage(startProactiveChatEvent);
@@ -92,6 +101,7 @@ const main = async () => {
     window["switchConfig"] = switchConfig;
     window["startProactiveChat"] = startProactiveChat;
     window["startChat"] = startChat;
+    window["endChat"] = endChat;
     window["setCustomContext"] = setCustomContext;
     switchConfig(await getCustomizationJson());
 };

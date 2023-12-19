@@ -1,6 +1,6 @@
 {
   "name": "@microsoft/omnichannel-chat-widget",
-  "version": "1.4.1-0",
+  "version": "1.5.1-0",
   "description": "Microsoft Omnichannel Chat Widget",
   "main": "lib/cjs/index.js",
   "types": "lib/types/index.d.ts",
@@ -74,8 +74,8 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@microsoft/omnichannel-chat-components": "^1.0.7",
-    "@microsoft/omnichannel-chat-sdk": "1.5.4",
+    "@microsoft/omnichannel-chat-components": "^1.1.0",
+    "@microsoft/omnichannel-chat-sdk": "1.6.2",
     "abort-controller-es5": "^2.0.1",
     "dompurify": "^2.3.4",
     "markdown-it": "^12.3.2",
@@ -97,8 +97,8 @@
     "test:e2e:build": "yarn build-sample && cd automation_tests && yarn test",
     "test:visual": "jest -c jest.config.visual.cjs",
     "test:all": "yarn test:unit && yarn test:visual",
-    "build:esm": "babel ./src --config-file ./babel.esm.config.json --out-dir lib/esm --extensions .ts,.js,.tsx --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx",
-    "build:cjs": "babel ./src --config-file ./babel.config.json --out-dir lib/cjs --extensions .ts,.js,.tsx --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx",
+    "build:esm": "babel ./src --config-file ./babel.esm.config.json --out-dir lib/esm --extensions .ts,.js,.tsx --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx",
+    "build:cjs": "babel ./src --config-file ./babel.config.json --out-dir lib/cjs --extensions .ts,.js,.tsx --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx",
     "verify": "yarn install && yarn build-storybook && yarn test:all && yarn build && yarn storybook",
     "testpack": "yarn build && yarn pack",
     "build-sample": "yarn build && webpack --config ./webpack.config.cjs",
