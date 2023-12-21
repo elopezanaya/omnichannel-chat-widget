@@ -26,13 +26,4 @@ jobs:
           node-version: 16.X
       - name: Install Chat Widget packages
         working-directory: chat-widget
-        run: yarn install
-      - name: Build Composite Storybook
-        working-directory: chat-widget
-        run: yarn build-composite-storybook
-      - name: Deploy Storybook
-        uses: JamesIves/github-pages-deploy-action@v4.3.3
-        with:
-          branch: gh-pages
-          folder: ./chat-widget/storybook-build
-          target-folder: docs/storybook
+        run: echo "simulation of storybooks"
