@@ -247,7 +247,7 @@ All notable changes to this project will be documented in this file.
 
 - Fixed various bugs on chat flow and customizability
 
-# Chat Components
+# Chat-Components
 
 ## [Unreleased]
 
