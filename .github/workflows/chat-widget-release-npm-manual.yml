@@ -1,4 +1,4 @@
-name: Release to NPM a new chat-widget version
+name:  ✨ ✨ ✨ ✨ Release to NPM a new chat-widget version ⚡⚡⚡⚡⚡⚡
 
 on:
   workflow_dispatch:
