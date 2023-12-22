@@ -3,8 +3,10 @@
 All notable changes to this project will be documented in this file.
 
 # Chat-Widget
+## [Unreleased] 
 
-## [Unreleased]
+
+## [1.6.1] 2023-12-22
 
 ### Fixed
 
