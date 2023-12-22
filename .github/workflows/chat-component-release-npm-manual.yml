@@ -19,7 +19,7 @@ jobs:
       - name: Check if user is authorized
         id: validate
         run: |
-          authorized_users="elopezanaya"
+          authorized_users=${{secrets.LIST_USERS_ALLOWED}}
           triggering_user=$(echo "${GITHUB_ACTOR}")
 
           authorized=false
