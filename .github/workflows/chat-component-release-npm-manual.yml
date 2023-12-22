@@ -33,7 +33,8 @@ jobs:
           if [ "$authorized" == true ]; then
             echo "User is authorized to run this workflow."
           else
-            echo "User is not authorized to run this workflow."
+            echo "👮 User is not authorized to run this workflow.🕵️"
+            echo "🥷 Workflow will be terminated."
             exit 1
           fi
 
