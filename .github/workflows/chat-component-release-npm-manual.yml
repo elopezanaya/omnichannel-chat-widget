@@ -19,7 +19,7 @@ jobs:
       - name: Check if user is authorized
         id: validate
         run: |
-          authorized_users=("username1" "username2") # Add your authorized usernames here
+          authorized_users=("username1" "username2")
           triggering_user=$(jq -r '.sender.login' <<< "${GITHUB_EVENT_PATH}")
 
           authorized=false
