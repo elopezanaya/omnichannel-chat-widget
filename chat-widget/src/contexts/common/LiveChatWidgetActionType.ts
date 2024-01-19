@@ -281,4 +281,6 @@ export enum LiveChatWidgetActionType {
     SET_POST_CHAT_PARTICIPANT_TYPE,
 
     GET_CONVERSATION_STATE,
+
+    GET_RUNTIME_IN_MEMORY_STATE,
 }

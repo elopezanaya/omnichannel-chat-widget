@@ -600,6 +600,9 @@ const reducer = (state: ILiveChatWidgetContext, action: ILiveChatWidgetAction): 
                 };
 
             }
+        case LiveChatWidgetActionType.GET_RUNTIME_IN_MEMORY_STATE: {
+            return inMemory;
+        }
 
         default:
             return state;

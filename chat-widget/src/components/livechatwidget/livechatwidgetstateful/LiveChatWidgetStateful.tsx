@@ -147,12 +147,14 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
             if (isReconnectEnabled(props.chatConfig) === true && !isPersistentEnabled(props.chatConfig)) {
 
                 const noValidReconnectId = await handleChatReconnect(chatSDK, props, dispatch, setAdapter, initStartChat, state);
-                
-                const last= getReducer()(state, { type: LiveChatWidgetActionType.GET_CONVERSATION_STATE, payload: null });
+
+              
+            
+                const last= getReducer()(state, { type: LiveChatWidgetActionType.GET_RUNTIME_IN_MEMORY_STATE, payload: null });
                 console.log("ELOPEZANAYA ::livechatsttfull:: startChat:: isReconnectTriggered:: last.lastStamp => ",last.lastStamp);
                 console.log("ELOPEZANAYA ::livechatsttfull:: startChat:: isReconnectTriggered:: last.conversationState => ",last.appStates.conversationState);
 
-                dispatch({ type: LiveChatWidgetActionType.GET_CONVERSATION_STATE, payload: null });
+                   
                 console.log("ELOPEZANAYA ::livechatsttfull:: startChat:: isReconnectTriggered:: state.conversationState => ",state.appStates.conversationState);
                 console.log("ELOPEZANAYA ::livechatsttfull:: startChat:: isReconnectTriggered:: state.lastStamp => ",state.lastStamp);
 
