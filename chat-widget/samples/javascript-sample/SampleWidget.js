@@ -7,10 +7,10 @@ import { getUnreadMessageCount, registerVisibilityListener } from "./getUnreadMe
 import { BroadcastService } from "../../lib/esm/index.js";
 import LiveChatWidget from "../../lib/esm/components/livechatwidget/LiveChatWidget.js";
 import { OmnichannelChatSDK } from "@microsoft/omnichannel-chat-sdk";
-import ReactDOM from "react-dom";
 import { version as chatComponentVersion } from "@microsoft/omnichannel-chat-components/package.json";
 import { version as chatSdkVersion } from "@microsoft/omnichannel-chat-sdk/package.json";
 import { version as chatWidgetVersion } from "../../package.json";
+import { createRoot } from "react-dom";
 import { getCustomizationJson } from "./getCustomizationJson";
 import { memoryDataStore } from "./Common/MemoryDataStore";
 
@@ -49,10 +49,10 @@ const main = async () => {
             }
         };
 
-        ReactDOM.render(
-            <LiveChatWidget {...liveChatWidgetProps} />,
-            document.getElementById("oc-lcw-container")
-        );
+        const container = document.getElementById("oc-lcw-container");
+        const root = createRoot(container); // createRoot(container!) if you use TypeScript
+        root.render( <LiveChatWidget {...liveChatWidgetProps} />);
+
     };
 
     const setCustomContext = () => {

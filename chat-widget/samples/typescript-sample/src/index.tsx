@@ -1,19 +1,21 @@
-import { OmnichannelChatSDK } from "@microsoft/omnichannel-chat-sdk";
-import { LiveChatWidget } from "@microsoft/omnichannel-chat-widget";
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import * as OcChatComponentPackageInfo from "@microsoft/omnichannel-chat-components/package.json";
 import * as OcChatSdkPackageinfo from "@microsoft/omnichannel-chat-sdk/package.json";
 import * as OcChatWidgetPackageInfo from "@microsoft/omnichannel-chat-widget/package.json";
-import * as OcChatComponentPackageInfo from "@microsoft/omnichannel-chat-components/package.json";
-import { defaultProps } from "../src/common/defaultProps";
+
+import React, { useEffect, useState } from "react";
+
 import { CoffeeChatIconBase64 } from "../src/common/assets";
+import { LiveChatWidget } from "@microsoft/omnichannel-chat-widget";
+import { OmnichannelChatSDK } from "@microsoft/omnichannel-chat-sdk";
+import { createRoot } from "react-dom/client";
+import { defaultProps } from "../src/common/defaultProps";
 
 const getOmnichannelChatConfig = () => {
     // add your own OC setting, hard-coded just for sample, should be replaced with a better handling
     const omnichannelConfig = {
         orgId: "<DATA-ORG-ID>",
         orgUrl: "<DATA-ORG-URL>",
-        widgetId: "<DATA-APP-ID>"
+        widgetId: "<DATA-APP-ID>",
     };
     return omnichannelConfig;
 };
@@ -23,7 +25,7 @@ const App = () => {
     const OcSdkPkginfo = OcChatSdkPackageinfo;
     const OcChatWidgetPkgInfo = OcChatWidgetPackageInfo;
     const OcChatComponentPkgInfo = OcChatComponentPackageInfo;
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [liveChatWidgetProps, setLiveChatWidgetProps] = useState<any>();
     const omnichannelConfig = getOmnichannelChatConfig();
@@ -36,7 +38,8 @@ const App = () => {
 
             const liveChatWidgetProps = {
                 ...defaultProps,
-                chatButtonProps: { // example: chat button customization overrides
+                chatButtonProps: {
+                    // example: chat button customization overrides
                     controlProps: {
                         titleText: "",
                         subtitleText: "",
@@ -51,57 +54,62 @@ const App = () => {
                         iconStyleProps: {
                             backgroundColor: "#c5ecc5",
                             backgroundImage: `url(${CoffeeChatIconBase64})`,
-                        }
+                        },
                     },
                 },
-                headerProps: { // example: default header is being overriden with a new background color style
+                headerProps: {
+                    // example: default header is being overriden with a new background color style
                     styleProps: {
                         generalStyleProps: {
-                            background: "#c5ecc5"
-                        }
-                    }
+                            background: "#c5ecc5",
+                        },
+                    },
                 },
-                loadingPaneProps: { // example: loading pane customization overrides
+                loadingPaneProps: {
+                    // example: loading pane customization overrides
                     styleProps: {
                         generalStyleProps: {
-                            backgroundColor: "#c5ecc5"
-                        }
+                            backgroundColor: "#c5ecc5",
+                        },
                     },
                     titleStyleProps: {
-                        fontFamily: "Garamond"
+                        fontFamily: "Garamond",
                     },
                     subtitleStyleProps: {
-                        fontFamily: "Garamond"
+                        fontFamily: "Garamond",
                     },
                     spinnerTextStyleProps: {
-                        fontFamily: "Garamond"
-                    }
+                        fontFamily: "Garamond",
+                    },
                 },
-                webChatContainerProps: { // example: web chat customization overrides
+                webChatContainerProps: {
+                    // example: web chat customization overrides
                     webChatStyles: {
                         bubbleBackground: "white",
                         bubbleFromUserBackground: "#c5ecc5",
                         bubbleFromUserTextColor: "#051005",
                         bubbleTextColor: "#051005",
-                        primaryFont: "Garamond"
+                        primaryFont: "Garamond",
                     },
                     disableMarkdownMessageFormatting: true, // setting the default to true for a known issue with markdown
                 },
-                styleProps: { // example: adjusting sizing and placement of the chat widget
+                styleProps: {
+                    // example: adjusting sizing and placement of the chat widget
                     generalStyles: {
                         width: "50%",
                         height: "800px",
                         bottom: "30px",
-                        right: "30px"
-                    }
+                        right: "30px",
+                    },
                 },
                 chatSDK, // mandatory
                 chatConfig, // mandatory
-                telemetryConfig: { // mandatory for telemetry
+                telemetryConfig: {
+                    // mandatory for telemetry
                     chatWidgetVersion: OcChatWidgetPkgInfo.version,
                     chatComponentVersion: OcChatComponentPkgInfo.version,
-                    OCChatSDKVersion: OcSdkPkginfo.version
-                }
+                    OCChatSDKVersion: OcSdkPkginfo.version,
+                },
             };
 
             setLiveChatWidgetProps(liveChatWidgetProps);
@@ -116,8 +124,5 @@ const App = () => {
         </div>
     );
 };
-
-ReactDOM.render(
-    <App />,
-    document.getElementById("root")
-);
+const container = document.getElementById("app");
+createRoot(container).render(<App />);
