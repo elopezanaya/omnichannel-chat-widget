@@ -130,6 +130,10 @@ const endChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: ILiveCh
             //Get auth token again if chat continued for longer time, otherwise gets 401 error
             await handleAuthentication(chatSDK, props.chatConfig, props.getAuthToken);
             await chatSDK?.endChat();
+
+            TelemetryHelper.logSDKEvent(LogLevel.INFO, {
+                Event: TelemetryEvent.EndChatSDKCallSucceeded
+            });
         } catch (ex) {
             TelemetryHelper.logSDKEvent(LogLevel.ERROR, {
                 Event: TelemetryEvent.EndChatSDKCallFailed,
@@ -145,18 +149,24 @@ const endChat = async (props: ILiveChatWidgetProps, chatSDK: any, state: ILiveCh
 
     if (!skipCloseChat) {
         try {
+            TelemetryHelper.logActionEvent(LogLevel.INFO, {
+                Event: TelemetryEvent.CloseChatCall,
+                Description: "Closing chat widget"
+            });
+
             adapter?.end();
             setAdapter(undefined);
             setWebChatStyles({ ...defaultWebChatContainerStatefulProps.webChatStyles, ...props.webChatContainerProps?.webChatStyles });
             WebChatStoreLoader.store = null;
             closeChatStateCleanUp(dispatch);
+
             TelemetryHelper.logActionEvent(LogLevel.INFO, {
-                Event: TelemetryEvent.CloseChatCall,
+                Event: TelemetryEvent.ClosingChatSucceeded,
                 Description: "Chat was closed succesfully"
             });
         } catch (error) {
             TelemetryHelper.logActionEvent(LogLevel.ERROR, {
-                Event: TelemetryEvent.CloseChatMethodException,
+                Event: TelemetryEvent.ClosingChatFailed,
                 ExceptionDetails: {
                     exception: `Failed to endChat: ${error}`
                 }

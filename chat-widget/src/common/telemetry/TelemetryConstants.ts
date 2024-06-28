@@ -94,6 +94,9 @@ export enum TelemetryEvent {
     GetConversationDetailsCallStarted = "GetConversationDetailsCallStarted",
     GetConversationDetailsCallFailed = "GetConversationDetailsCallFailed",
     EndChatSDKCallFailed = "EndChatSDKCallFailed",
+    EndChatSDKCallSucceeded = "EndChatSDKCallSucceeded",
+    ClosingChatSucceeded= "ClosingChatSucceeded",
+    ClosingChatFailed= "ClosingChatFailed",
     GetChatReconnectContextSDKCallStarted = "GetChatReconnectContextSDKCallStarted",
     GetChatReconnectContextSDKCallFailed = "GetChatReconnectContextSDKCallFailed",
     ParseAdaptiveCardFailed = "ParseAdaptiveCardFailed",
@@ -304,6 +307,8 @@ export class TelemetryConstants {
             case TelemetryEvent.EndChatSDKCall:
             case TelemetryEvent.EndChatEventReceived:
             case TelemetryEvent.EndChatSDKCallFailed:
+            case TelemetryEvent.ClosingChatSucceeded:
+            case TelemetryEvent.ClosingChatFailed:
             case TelemetryEvent.PostChatContextCallFailed:
             case TelemetryEvent.PostChatContextCallSucceed:
             case TelemetryEvent.GetConversationDetailsException:
