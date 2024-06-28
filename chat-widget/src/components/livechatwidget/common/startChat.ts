@@ -2,6 +2,9 @@ import { BroadcastEvent, LogLevel, TelemetryEvent } from "../../../common/teleme
 import { Constants, LiveWorkItemState, WidgetLoadCustomErrorString, WidgetLoadTelemetryMessage } from "../../../common/Constants";
 import { checkContactIdError, createTimer, getConversationDetailsCall, getStateFromCache, getWidgetCacheIdfromProps, isNullOrEmptyString, isUndefinedOrEmpty } from "../../../common/utils";
 import { getAuthClientFunction, handleAuthentication } from "./authHelper";
+import { handleChatReconnect, isPersistentEnabled, isReconnectEnabled } from "./reconnectChatHelper";
+import { handleStartChatError, logWidgetLoadComplete } from "./startChatErrorHandler";
+
 import { ActivityStreamHandler } from "./ActivityStreamHandler";
 import { BroadcastService } from "@microsoft/omnichannel-chat-components";
 import { ConversationState } from "../../../contexts/common/ConversationState";
@@ -13,13 +16,11 @@ import { LiveChatWidgetActionType } from "../../../contexts/common/LiveChatWidge
 import StartChatOptionalParams from "@microsoft/omnichannel-chat-sdk/lib/core/StartChatOptionalParams";
 import { TelemetryHelper } from "../../../common/telemetry/TelemetryHelper";
 import { TelemetryTimers } from "../../../common/telemetry/TelemetryManager";
+import { chatSDKStateCleanUp } from "./endChat";
 import { createAdapter } from "./createAdapter";
 import { createOnNewAdapterActivityHandler } from "../../../plugins/newMessageEventHandler";
-import { handleChatReconnect, isPersistentEnabled, isReconnectEnabled } from "./reconnectChatHelper";
 import { setPostChatContextAndLoadSurvey } from "./setPostChatContextAndLoadSurvey";
 import { updateSessionDataForTelemetry } from "./updateSessionDataForTelemetry";
-import { logWidgetLoadComplete, handleStartChatError } from "./startChatErrorHandler";
-import { chatSDKStateCleanUp } from "./endChat";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let optionalParams: StartChatOptionalParams = {};
@@ -154,10 +155,14 @@ const initStartChat = async (chatSDK: any, dispatch: Dispatch<ILiveChatWidgetAct
             const startChatOptionalParams: StartChatOptionalParams = Object.assign({}, params, optionalParams, defaultOptionalParams);
             await chatSDK.startChat(startChatOptionalParams);
             isStartChatSuccessful = true;
+            TelemetryHelper.logSDKEvent(LogLevel.INFO, {
+                Event: TelemetryEvent.StartChatMethodSucceeded,
+                Description: "Start chat method succeeded"
+            });
         } catch (error) {
             checkContactIdError(error);
             TelemetryHelper.logSDKEvent(LogLevel.ERROR, {
-                Event: TelemetryEvent.StartChatMethodException,
+                Event: TelemetryEvent.StartChatMethodFailed,
                 ExceptionDetails: {
                     exception: `Failed to setup startChat: ${error}`
                 }

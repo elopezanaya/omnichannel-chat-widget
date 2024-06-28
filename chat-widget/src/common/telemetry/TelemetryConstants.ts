@@ -113,6 +113,8 @@ export enum TelemetryEvent {
     WidgetLoadComplete = "WidgetLoadComplete",
     WidgetLoadFailed = "WidgetLoadFailed",
     StartChatMethodException = "StartChatMethodException",
+    StartChatMethodFailed = "StartChatMethodFailed",
+    StartChatMethodSucceeded = "StartChatMethodSucceeded",
     CloseChatCall = "CloseChatCall",
     CloseChatMethodException = "CloseChatMethodException",
     PrechatSurveyLoaded = "PrechatSurveyLoaded",
@@ -298,6 +300,8 @@ export class TelemetryConstants {
             case TelemetryEvent.StartChatSDKCall:
             case TelemetryEvent.StartChatEventRecevied:
             case TelemetryEvent.StartChatMethodException:
+            case TelemetryEvent.StartChatMethodFailed:
+            case TelemetryEvent.StartChatMethodSucceeded:
             case TelemetryEvent.CloseChatMethodException:
             case TelemetryEvent.StartProactiveChatEventReceived:
             case TelemetryEvent.StartProactiveChatMethodFailed:
