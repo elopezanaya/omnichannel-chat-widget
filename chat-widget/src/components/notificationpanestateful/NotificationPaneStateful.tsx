@@ -1,12 +1,13 @@
 import { ConfirmationState, NotificationPaneConstants } from "../../common/Constants";
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useEffect, useRef } from "react";
+import React, { Dispatch, useEffect, useRef } from "react";
 
 import { ILiveChatWidgetAction } from "../../contexts/common/ILiveChatWidgetAction";
 import { ILiveChatWidgetContext } from "../../contexts/common/ILiveChatWidgetContext";
 import { INotificationPaneInternal } from "@microsoft/omnichannel-chat-components/lib/types/components/notificationpane/interfaces/common/INotificationPaneInternal";
 import { INotificationPaneStatefulProps } from "./interfaces/INotificationPaneStatefulProps";
 import { LiveChatWidgetActionType } from "../../contexts/common/LiveChatWidgetActionType";
+import {NotificationPane} from "@microsoft/omnichannel-chat-components";
 import { NotificationScenarios } from "../webchatcontainerstateful/webchatcontroller/enums/NotificationScenarios";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
 import { defaultChatDisconnectControlProps } from "./defaultProps/defaultChatDisconnectControlProps";
@@ -17,7 +18,7 @@ import useChatAdapterStore from "../../hooks/useChatAdapterStore";
 import useChatContextStore from "../../hooks/useChatContextStore";
 
 export const NotificationPaneStateful = (props: INotificationPaneStatefulProps) => {
-    const NotificationPane = lazy(() => import(/* webpackChunkName: "NotificationPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.NotificationPane })));
+    //const NotificationPane = lazy(() => import(/* webpackChunkName: "NotificationPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.NotificationPane })));
 
     const { notificationPaneProps, notificationScenarioType, endChat } = props;
 
@@ -150,12 +151,9 @@ export const NotificationPaneStateful = (props: INotificationPaneStatefulProps) 
     }
 
     return (
-
-        <Suspense fallback={<div>Loading</div>}>
-            <NotificationPane
-                {...genericPropsObj}
-            />
-        </Suspense>
+        <NotificationPane
+            {...genericPropsObj}
+        />
     );
 };
 

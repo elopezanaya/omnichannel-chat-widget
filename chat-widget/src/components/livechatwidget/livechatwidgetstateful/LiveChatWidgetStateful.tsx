@@ -41,6 +41,7 @@ import {
 } from "../../../controller/componentController";
 
 import { ActivityStreamHandler } from "../common/ActivityStreamHandler";
+import { CallingContainerStateful } from "../../callingcontainerstateful/CallingContainerStateful";
 import { ConversationState } from "../../../contexts/common/ConversationState";
 import { DataStoreManager } from "../../../common/contextDataStore/DataStoreManager";
 import DraggableChatWidget from "../../draggable/DraggableChatWidget";
@@ -55,6 +56,7 @@ import { LiveChatWidgetActionType } from "../../../contexts/common/LiveChatWidge
 import { StartChatFailureType } from "../../../contexts/common/StartChatFailureType";
 import StartChatOptionalParams from "@microsoft/omnichannel-chat-sdk/lib/core/StartChatOptionalParams";
 import { TelemetryHelper } from "../../../common/telemetry/TelemetryHelper";
+import { WebChatContainerStateful } from "../../webchatcontainerstateful/WebChatContainerStateful";
 import createDownloadTranscriptProps from "../common/createDownloadTranscriptProps";
 import { createFooter } from "../common/createFooter";
 import { createInternetConnectionChangeHandler } from "../common/createInternetConnectionChangeHandler";
@@ -89,8 +91,8 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     const ProactiveChatPaneStateful = lazy(() => import(/* webpackChunkName: "ProactiveChatPaneStateful" */ "../../proactivechatpanestateful/ProactiveChatPaneStateful"));
     const ReconnectChatPaneStateful = lazy(() => import(/* webpackChunkName: "ReconnectChatPaneStateful" */ "../../reconnectchatpanestateful/ReconnectChatPaneStateful"));
     const StartChatErrorPaneStateful = lazy(() => import(/* webpackChunkName: "StartChatErrorPaneStateful" */ "../../startchaterrorpanestateful/StartChatErrorPaneStateful"));
-    const WebChatContainerStateful = lazy(() => import(/* webpackChunkName: "WebChatContainerStateful" */ "../../webchatcontainerstateful/WebChatContainerStateful"));
-    const CallingContainerStateful = lazy(() => import(/* webpackChunkName: "CallingContainerStateful" */ "../../callingcontainerstateful/CallingContainerStateful"));
+    //const WebChatContainerStateful = lazy(() => import(/* webpackChunkName: "WebChatContainerStateful" */ "../../webchatcontainerstateful/WebChatContainerStateful"));
+    //const CallingContainerStateful = lazy(() => import(/* webpackChunkName: "CallingContainerStateful" */ "../../callingcontainerstateful/CallingContainerStateful"));
     const ConfirmationPaneStateful = lazy(() => import(/* webpackChunkName: "ConfirmationPaneStateful" */ "../../confirmationpanestateful/ConfirmationPaneStateful"));
 
 
@@ -735,93 +737,74 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
                         styles={generalStyles}
                         className={livechatProps.styleProps?.className}>
 
-                        {!livechatProps.controlProps?.hideChatButton && !livechatProps.controlProps?.hideStartChatButton && shouldShowChatButton(state) && (decodeComponentString(livechatProps.componentOverrides?.chatButton) ||
-                            <Suspense fallback={<div>Loading button</div>}><ChatButtonStateful buttonProps={livechatProps.chatButtonProps} outOfOfficeButtonProps={livechatProps.outOfOfficeChatButtonProps} startChat={prepareStartChatRelay} /></Suspense>)}
+                        <Suspense fallback={<div></div>}>
 
-                        {!livechatProps.controlProps?.hideProactiveChatPane && shouldShowProactiveChatPane(state) && (decodeComponentString(livechatProps.componentOverrides?.proactiveChatPane) || <ProactiveChatPaneStateful proactiveChatProps={livechatProps.proactiveChatPaneProps} startChat={prepareStartChatRelay} />)}
+                            {!livechatProps.controlProps?.hideChatButton && !livechatProps.controlProps?.hideStartChatButton && shouldShowChatButton(state) && (decodeComponentString(livechatProps.componentOverrides?.chatButton) || 
+                            
+                            <ChatButtonStateful buttonProps={livechatProps.chatButtonProps} outOfOfficeButtonProps={livechatProps.outOfOfficeChatButtonProps} startChat={prepareStartChatRelay} />
+                            
+                            )}
 
-                        {!livechatProps.controlProps?.hideHeader && shouldShowHeader(state) && (decodeComponentString(livechatProps.componentOverrides?.header) ||
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {!livechatProps.controlProps?.hideProactiveChatPane && shouldShowProactiveChatPane(state) && (decodeComponentString(livechatProps.componentOverrides?.proactiveChatPane) || 
+                            
+                            <ProactiveChatPaneStateful proactiveChatProps={livechatProps.proactiveChatPaneProps} startChat={prepareStartChatRelay} />
+                            
+                            )}
+
+                            {!livechatProps.controlProps?.hideHeader && shouldShowHeader(state) && (decodeComponentString(livechatProps.componentOverrides?.header) ||
+
                                 <HeaderStateful headerProps={livechatProps.headerProps} outOfOfficeHeaderProps={livechatProps.outOfOfficeHeaderProps} endChat={endChatRelay} {...headerDraggableConfig} />
-                            </Suspense>
-                        )}
+                            )}
 
-                        {!livechatProps.controlProps?.hideLoadingPane && shouldShowLoadingPane(state) && (decodeComponentString(livechatProps.componentOverrides?.loadingPane) ||
-                            <Suspense fallback={<div>Loading p1</div>}>
+                            {!livechatProps.controlProps?.hideLoadingPane && shouldShowLoadingPane(state) && (decodeComponentString(livechatProps.componentOverrides?.loadingPane) ||
+
                                 <LoadingPaneStateful loadingPaneProps={livechatProps.loadingPaneProps} startChatErrorPaneProps={livechatProps.startChatErrorPaneProps} />
-                            </Suspense>)}
+                            )}
 
+                            {!livechatProps.controlProps?.hideErrorUIPane && shouldShowStartChatErrorPane(state) && (decodeComponentString(livechatProps.componentOverrides?.startChatErrorPane) ||
 
-                        {!livechatProps.controlProps?.hideErrorUIPane && shouldShowStartChatErrorPane(state) && (decodeComponentString(livechatProps.componentOverrides?.startChatErrorPane) ||
-                            <Suspense fallback={<div>Loading..</div>}>
                                 <StartChatErrorPaneStateful {...livechatProps.startChatErrorPaneProps} />
-                            </Suspense>
+                            )}
 
-                        )}
+                            {!livechatProps.controlProps?.hideOutOfOfficeHoursPane && shouldShowOutOfOfficeHoursPane(state) && (decodeComponentString(livechatProps.componentOverrides?.outOfOfficeHoursPane) ||
 
-                        {!livechatProps.controlProps?.hideOutOfOfficeHoursPane && shouldShowOutOfOfficeHoursPane(state) && (decodeComponentString(livechatProps.componentOverrides?.outOfOfficeHoursPane) ||
-                            <Suspense fallback={<div>Loading..</div>}>
                                 <OutOfOfficeHoursPaneStateful {...livechatProps.outOfOfficeHoursPaneProps} />
-                            </Suspense>
+                            )}
 
-                        )}
-
-                        {!livechatProps.controlProps?.hideReconnectChatPane && shouldShowReconnectChatPane(state) && (decodeComponentString(livechatProps.componentOverrides?.reconnectChatPane) ||
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {!livechatProps.controlProps?.hideReconnectChatPane && shouldShowReconnectChatPane(state) && (decodeComponentString(livechatProps.componentOverrides?.reconnectChatPane) ||
                                 <ReconnectChatPaneStateful reconnectChatProps={livechatProps.reconnectChatPaneProps} initStartChat={initStartChatRelay} />
-                            </Suspense>
+                            )}
 
-                        )}
-
-                        {!livechatProps.controlProps?.hidePreChatSurveyPane && shouldShowPreChatSurveyPane(state) && (decodeComponentString(livechatProps.componentOverrides?.preChatSurveyPane) ||
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {!livechatProps.controlProps?.hidePreChatSurveyPane && shouldShowPreChatSurveyPane(state) && (decodeComponentString(livechatProps.componentOverrides?.preChatSurveyPane) ||
                                 <PreChatSurveyPaneStateful surveyProps={livechatProps.preChatSurveyPaneProps} initStartChat={initStartChatRelay} />
-                            </Suspense>
+                            )}
 
-                        )}
-
-                        {!livechatProps.controlProps?.hideCallingContainer && shouldShowCallingContainer(state) &&
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {!livechatProps.controlProps?.hideCallingContainer && shouldShowCallingContainer(state) &&
                                 <CallingContainerStateful voiceVideoCallingSdk={voiceVideoCallingSDK} {...livechatProps.callingContainerProps} />
-                            </Suspense>
+                            }
 
-                        }
-
-                        {!livechatProps.controlProps?.hideWebChatContainer && shouldShowWebChatContainer(state) && (decodeComponentString(livechatProps.componentOverrides?.webChatContainer) ||
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {!livechatProps.controlProps?.hideWebChatContainer && shouldShowWebChatContainer(state) && (decodeComponentString(livechatProps.componentOverrides?.webChatContainer) ||
                                 <WebChatContainerStateful {...livechatProps} />
-                            </Suspense>
+                            )}
 
-                        )}
-
-                        {!livechatProps.controlProps?.hideConfirmationPane && shouldShowConfirmationPane(state) && (decodeComponentString(livechatProps.componentOverrides?.confirmationPane) ||
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {!livechatProps.controlProps?.hideConfirmationPane && shouldShowConfirmationPane(state) && (decodeComponentString(livechatProps.componentOverrides?.confirmationPane) ||
                                 <ConfirmationPaneStateful {...confirmationPaneProps} setPostChatContext={setPostChatContextRelay} prepareEndChat={prepareEndChatRelay} />
-                            </Suspense>
+                            )}
 
-                        )}
-
-                        {!livechatProps.controlProps?.hidePostChatLoadingPane && shouldShowPostChatLoadingPane(state) && (decodeComponentString(livechatProps.componentOverrides?.postChatLoadingPane) ||
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {!livechatProps.controlProps?.hidePostChatLoadingPane && shouldShowPostChatLoadingPane(state) && (decodeComponentString(livechatProps.componentOverrides?.postChatLoadingPane) ||
                                 <PostChatLoadingPaneStateful {...livechatProps.postChatLoadingPaneProps} />
-                            </Suspense>
+                            )}
 
-                        )}
-
-                        {shouldShowPostChatSurveyPane(state) && (decodeComponentString(livechatProps.componentOverrides?.postChatSurveyPane) ||
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {shouldShowPostChatSurveyPane(state) && (decodeComponentString(livechatProps.componentOverrides?.postChatSurveyPane) ||
                                 <PostChatSurveyPaneStateful {...livechatProps.postChatSurveyPaneProps} {...livechatProps.chatSDK} />
+                            )}
 
-                            </Suspense>
-                        )}
+                            {createFooter(livechatProps, state)}
 
-                        {createFooter(livechatProps, state)}
-
-                        {shouldShowEmailTranscriptPane(state) && (decodeComponentString(livechatProps.componentOverrides?.emailTranscriptPane) ||
-                            <Suspense fallback={<div>Loading..</div>}>
+                            {shouldShowEmailTranscriptPane(state) && (decodeComponentString(livechatProps.componentOverrides?.emailTranscriptPane) ||
                                 <EmailTranscriptPaneStateful {...livechatProps.emailTranscriptPane} />
-                            </Suspense>
-                        )}
+                            )}
+                        </Suspense>
                     </Stack>
                 </Composer>
             </DraggableChatWidget>

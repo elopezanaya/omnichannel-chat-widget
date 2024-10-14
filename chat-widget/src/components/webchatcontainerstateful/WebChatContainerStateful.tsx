@@ -2,9 +2,10 @@
 
 import { IRawStyle, IStackStyles, Stack } from "@fluentui/react";
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useEffect } from "react";
+import React, { Dispatch, useEffect } from "react";
 
 import { BotMagicCodeStore } from "./webchatcontroller/BotMagicCodeStore";
+import { Components } from "botframework-webchat";
 import { Constants } from "../../common/Constants";
 import { ILiveChatWidgetAction } from "../../contexts/common/ILiveChatWidgetAction";
 import { ILiveChatWidgetContext } from "../../contexts/common/ILiveChatWidgetContext";
@@ -51,7 +52,8 @@ const createMagicCodeSuccessResponse = (signin: string) => {
 
 export const WebChatContainerStateful = (props: ILiveChatWidgetProps) => {
     
-    const BasicWebChat = lazy(() => import("botframework-webchat").then(module => ({ default: module.Components.BasicWebChat })));
+    //const BasicWebChat = lazy(() => import("botframework-webchat").then(module => ({ default: module.Components.BasicWebChat })));
+    const {BasicWebChat} = Components;
 
     const [state, dispatch]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();
     const {webChatContainerProps, contextDataStore} = props;
@@ -213,9 +215,7 @@ export const WebChatContainerStateful = (props: ILiveChatWidgetProps) => {
         }
         `}</style>
         <Stack styles={containerStyles} className="webchat__stacked-layout_container">
-            <Suspense>
-                <BasicWebChat></BasicWebChat>
-            </Suspense>
+            <BasicWebChat></BasicWebChat>
         </Stack>
         </>
     );

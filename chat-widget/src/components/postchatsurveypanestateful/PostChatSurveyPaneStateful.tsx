@@ -1,5 +1,5 @@
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useEffect } from "react";
+import React, { Dispatch, useEffect } from "react";
 
 import { CustomerVoiceEvents } from "./enums/CustomerVoiceEvents";
 import { ILiveChatWidgetAction } from "../../contexts/common/ILiveChatWidgetAction";
@@ -10,6 +10,7 @@ import { IPostChatSurveyPaneStyleProps } from "@microsoft/omnichannel-chat-compo
 import { IStyle } from "@fluentui/react";
 import { ParticipantType } from "../../common/Constants";
 import { PostChatSurveyMode } from "./enums/PostChatSurveyMode";
+import {PostChatSurveyPane} from "@microsoft/omnichannel-chat-components";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
 import { defaultGeneralPostChatSurveyPaneStyleProps } from "./common/defaultStyleProps/defaultgeneralPostChatSurveyPaneStyleProps";
 import { findAllFocusableElement } from "../../common/utils";
@@ -26,7 +27,7 @@ const generateSurveyInviteLink = (surveyInviteLink: string, isEmbed: boolean, lo
 };
 
 export const PostChatSurveyPaneStateful = (props: IPostChatSurveyPaneStatefulProps) => {
-    const PostChatSurveyPane = lazy(() => import(/* webpackChunkName: "PostChatSurveyPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.PostChatSurveyPane })));
+    //const PostChatSurveyPane = lazy(() => import(/* webpackChunkName: "PostChatSurveyPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.PostChatSurveyPane })));
 
     const [state]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();
 
@@ -87,12 +88,10 @@ export const PostChatSurveyPaneStateful = (props: IPostChatSurveyPaneStatefulPro
     }, []);
 
     return (
-        <Suspense fallback={<div>Loading</div>}>
-            <PostChatSurveyPane
-                controlProps={controlProps}
-                styleProps={styleProps}
-            />
-        </Suspense>
+        <PostChatSurveyPane
+            controlProps={controlProps}
+            styleProps={styleProps}
+        />
     );
 };
 

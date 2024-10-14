@@ -1,5 +1,5 @@
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useCallback, useEffect, useState } from "react";
+import React, { Dispatch, useCallback, useEffect, useState } from "react";
 import { findAllFocusableElement, findParentFocusableElementsWithoutChildContainer, formatTemplateString, preventFocusToMoveOutOfElement, setFocusOnElement, setFocusOnSendBox, setTabIndices } from "../../common/utils";
 
 import { DimLayer } from "../dimlayer/DimLayer";
@@ -8,6 +8,7 @@ import { IEmailTranscriptPaneProps } from "./interfaces/IEmailTranscriptPaneProp
 import { IInputValidationPaneControlProps } from "@microsoft/omnichannel-chat-components/lib/types/components/inputvalidationpane/interfaces/IInputValidationPaneControlProps";
 import { ILiveChatWidgetAction } from "../../contexts/common/ILiveChatWidgetAction";
 import { ILiveChatWidgetContext } from "../../contexts/common/ILiveChatWidgetContext";
+import {InputValidationPane} from "@microsoft/omnichannel-chat-components";
 import { LiveChatWidgetActionType } from "../../contexts/common/LiveChatWidgetActionType";
 import { NotificationHandler } from "../webchatcontainerstateful/webchatcontroller/notification/NotificationHandler";
 import { NotificationScenarios } from "../webchatcontainerstateful/webchatcontroller/enums/NotificationScenarios";
@@ -19,7 +20,7 @@ import useChatSDKStore from "../../hooks/useChatSDKStore";
 
 export const EmailTranscriptPaneStateful = (props: IEmailTranscriptPaneProps) => {
 
-    const InputValidationPane = lazy(() => import(/* webpackChunkName: "InputValidationPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.InputValidationPane })));
+    //const InputValidationPane = lazy(() => import(/* webpackChunkName: "InputValidationPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.InputValidationPane })));
 
     const initialTabIndexMap: Map<string, number> = new Map();
     let elements: HTMLElement[] | null = [];
@@ -98,12 +99,10 @@ export const EmailTranscriptPaneStateful = (props: IEmailTranscriptPaneProps) =>
     return (
         <>
             <DimLayer brightness={controlProps?.brightnessValueOnDim ?? "0.2"} />
-            <Suspense fallback={<div>Loading..</div>}>
-                <InputValidationPane
-                    componentOverrides={props.componentOverrides}
-                    controlProps={controlProps}
-                    styleProps={props.styleProps} />
-            </Suspense>
+            <InputValidationPane
+                componentOverrides={props.componentOverrides}
+                controlProps={controlProps}
+                styleProps={props.styleProps} />
         </>
     );
 };

@@ -1,9 +1,10 @@
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useEffect, useRef, useState } from "react";
+import React, { Dispatch, useEffect, useRef, useState } from "react";
 
 import { ConfirmationState } from "../../common/Constants";
 import { ConversationState } from "../../contexts/common/ConversationState";
 import DraggableEventEmitter from "../draggable/DraggableEventEmitter";
+import {Header} from "@microsoft/omnichannel-chat-components";
 import { IHeaderControlProps } from "@microsoft/omnichannel-chat-components/lib/types/components/header/interfaces/IHeaderControlProps";
 import { IHeaderStatefulParams } from "./interfaces/IHeaderStatefulParams";
 import { IHeaderStyleProps } from "@microsoft/omnichannel-chat-components/lib/types/components/header/interfaces/IHeaderStyleProps";
@@ -17,7 +18,7 @@ import useChatContextStore from "../../hooks/useChatContextStore";
 
 export const HeaderStateful = (props: IHeaderStatefulParams) => {
 
-    const Header = lazy(() => import(/* webpackChunkName: "CallingContainer" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.Header })));
+    //const Header = lazy(() => import(/* webpackChunkName: "CallingContainer" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.Header })));
 
     const [state, dispatch]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,13 +116,11 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
     }
 
     return (
-        <Suspense>
-            <Header
-                componentOverrides={headerProps?.componentOverrides}
-                controlProps={(outOfOperatingHours || state.appStates.conversationState === ConversationState.OutOfOffice) ? outOfOfficeControlProps : controlProps}
-                styleProps={(outOfOperatingHours || state.appStates.conversationState === ConversationState.OutOfOffice) ? outOfOfficeStyleProps : headerProps?.styleProps}
-            />
-        </Suspense>
+        <Header
+            componentOverrides={headerProps?.componentOverrides}
+            controlProps={(outOfOperatingHours || state.appStates.conversationState === ConversationState.OutOfOffice) ? outOfOfficeControlProps : controlProps}
+            styleProps={(outOfOperatingHours || state.appStates.conversationState === ConversationState.OutOfOffice) ? outOfOfficeStyleProps : headerProps?.styleProps}
+        />
     );
 };
 

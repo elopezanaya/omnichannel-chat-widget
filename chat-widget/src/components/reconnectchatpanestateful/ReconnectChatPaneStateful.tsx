@@ -1,5 +1,5 @@
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useEffect } from "react";
+import React, { Dispatch, useEffect } from "react";
 
 import { ConversationState } from "../../contexts/common/ConversationState";
 import { ILiveChatWidgetAction } from "../../contexts/common/ILiveChatWidgetAction";
@@ -7,6 +7,7 @@ import { ILiveChatWidgetContext } from "../../contexts/common/ILiveChatWidgetCon
 import { IReconnectChatPaneControlProps } from "@microsoft/omnichannel-chat-components/lib/types/components/reconnectchatpane/interfaces/IReconnectChatPaneControlProps";
 import { IReconnectChatPaneStatefulParams } from "./interfaces/IReconnectChatPaneStatefulParams";
 import { LiveChatWidgetActionType } from "../../contexts/common/LiveChatWidgetActionType";
+import {ReconnectChatPane} from "@microsoft/omnichannel-chat-components";
 import StartChatOptionalParams from "@microsoft/omnichannel-chat-sdk/lib/core/StartChatOptionalParams";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
 import { setFocusOnElement } from "../../common/utils";
@@ -15,7 +16,7 @@ import useChatSDKStore from "../../hooks/useChatSDKStore";
 
 export const ReconnectChatPaneStateful = (props: IReconnectChatPaneStatefulParams) => {
 
-    const ReconnectChatPane = lazy(() => import(/* webpackChunkName: "ReconnectChatPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.ReconnectChatPane })));
+    //const ReconnectChatPane = lazy(() => import(/* webpackChunkName: "ReconnectChatPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.ReconnectChatPane })));
 
     const [state, dispatch]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,13 +78,11 @@ export const ReconnectChatPaneStateful = (props: IReconnectChatPaneStatefulParam
     }, []);
 
     return (
-        <Suspense fallback={<div>Loading</div>}>
-            <ReconnectChatPane
-                componentOverrides={reconnectChatProps?.componentOverrides}
-                controlProps={controlProps}
-                styleProps={reconnectChatProps?.styleProps}
-            />
-        </Suspense>
+        <ReconnectChatPane
+            componentOverrides={reconnectChatProps?.componentOverrides}
+            controlProps={controlProps}
+            styleProps={reconnectChatProps?.styleProps}
+        />
     );
 };
 

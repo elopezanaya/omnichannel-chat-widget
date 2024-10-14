@@ -1,12 +1,13 @@
 import { IImageProps, IStyle } from "@fluentui/react";
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useEffect } from "react";
+import React, { Dispatch, useEffect } from "react";
 
 import { ILiveChatWidgetAction } from "../../contexts/common/ILiveChatWidgetAction";
 import { ILiveChatWidgetContext } from "../../contexts/common/ILiveChatWidgetContext";
 import { ILoadingPaneControlProps } from "@microsoft/omnichannel-chat-components/lib/types/components/loadingpane/interfaces/ILoadingPaneControlProps";
 import { ILoadingPaneStyleProps } from "@microsoft/omnichannel-chat-components/lib/types/components/loadingpane/interfaces/ILoadingPaneStyleProps";
 import { IStartChatErrorPaneProps } from "./interfaces/IStartChatErrorPaneProps";
+import {LoadingPane} from "@microsoft/omnichannel-chat-components";
 import { StartChatErrorPaneConstants } from "../../common/Constants";
 import { StartChatFailureType } from "../../contexts/common/StartChatFailureType";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
@@ -20,7 +21,7 @@ import useChatContextStore from "../../hooks/useChatContextStore";
 
 export const StartChatErrorPaneStateful = (startChatErrorPaneProps: IStartChatErrorPaneProps) => {
     const [state, ]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();
-    const LoadingPane = lazy(() => import(/* webpackChunkName: "LoadingPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.LoadingPane })));
+    //const LoadingPane = lazy(() => import(/* webpackChunkName: "LoadingPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.LoadingPane })));
 
     
     const generalStyleProps: IStyle = Object.assign({}, defaultStartChatErrorPaneGeneralStyleProps, startChatErrorPaneProps?.styleProps?.generalStyleProps);
@@ -73,13 +74,11 @@ export const StartChatErrorPaneStateful = (startChatErrorPaneProps: IStartChatEr
     }, []);
     
     return (
-        <Suspense fallback={<div>Loading</div>}>
-            <LoadingPane
-                componentOverrides={startChatErrorPaneProps?.componentOverrides}
-                controlProps={errorUIControlProps}
-                styleProps={errorUIStyleProps}
-            />
-        </Suspense>
+        <LoadingPane
+            componentOverrides={startChatErrorPaneProps?.componentOverrides}
+            controlProps={errorUIControlProps}
+            styleProps={errorUIStyleProps}
+        />
     );
 };
 

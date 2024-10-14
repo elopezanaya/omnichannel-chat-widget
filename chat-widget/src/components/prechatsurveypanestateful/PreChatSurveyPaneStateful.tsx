@@ -1,6 +1,6 @@
 import { HtmlAttributeNames, Regex } from "../../common/Constants";
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useEffect } from "react";
+import React, { Dispatch, useEffect } from "react";
 import { extractPreChatSurveyResponseValues, findAllFocusableElement, getStateFromCache, getWidgetCacheId, isUndefinedOrEmpty, parseAdaptiveCardPayload } from "../../common/utils";
 
 import { ConversationState } from "../../contexts/common/ConversationState";
@@ -12,6 +12,7 @@ import { IPreChatSurveyPaneStyleProps } from "@microsoft/omnichannel-chat-compon
 import { IStyle } from "@fluentui/react";
 import { LiveChatWidgetActionType } from "../../contexts/common/LiveChatWidgetActionType";
 import MarkdownIt from "markdown-it";
+import {PreChatSurveyPane} from "@microsoft/omnichannel-chat-components";
 import StartChatOptionalParams from "@microsoft/omnichannel-chat-sdk/lib/core/StartChatOptionalParams";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
 import { defaultGeneralPreChatSurveyPaneStyleProps } from "./common/defaultStyles/defaultGeneralPreChatSurveyPaneStyleProps";
@@ -21,7 +22,7 @@ import useChatContextStore from "../../hooks/useChatContextStore";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const PreChatSurveyPaneStateful = (props: IPreChatSurveyPaneStatefulParams) => {
 
-    const PreChatSurveyPane = lazy(() => import(/* webpackChunkName: "PreChatSurveyPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.PreChatSurveyPane })));
+    //const PreChatSurveyPane = lazy(() => import(/* webpackChunkName: "PreChatSurveyPane" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.PreChatSurveyPane })));
     // Set MarkDown global variable to be used for prechat adaptive cards
     window["markdownit"] = MarkdownIt;
 
@@ -146,11 +147,11 @@ export const PreChatSurveyPaneStateful = (props: IPreChatSurveyPaneStatefulParam
     }, []);
 
     return (
-        <Suspense fallback={<div>Loading</div>}>
-            <PreChatSurveyPane
-                controlProps={controlProps}
-                styleProps={styleProps} />
-        </Suspense>
+
+        <PreChatSurveyPane
+            controlProps={controlProps}
+            styleProps={styleProps} />
+
     );
 };
 

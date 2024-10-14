@@ -1,6 +1,7 @@
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
-import React, { Dispatch, Suspense, lazy, useEffect, useRef, useState } from "react";
+import React, { Dispatch, useEffect, useRef, useState } from "react";
 
+import  {ChatButton} from "@microsoft/omnichannel-chat-components";
 import { Constants } from "../../common/Constants";
 import { ConversationState } from "../../contexts/common/ConversationState";
 import { IChatButtonControlProps } from "@microsoft/omnichannel-chat-components/lib/types/components/chatbutton/interfaces/IChatButtonControlProps";
@@ -16,10 +17,7 @@ import { setFocusOnElement } from "../../common/utils";
 import useChatContextStore from "../../hooks/useChatContextStore";
 
 export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
-
-    const ChatButton = lazy(() => import(/* webpackChunkName: "ChatButton" */ "@microsoft/omnichannel-chat-components").then((module) => ({ default: module.ChatButton })));
-
-
+    //const ChatButton = lazy(() => import(/* webpackChunkName: "ChatButton" */ "@microsoft/omnichannel-chat-components").then((module) => ({ default: module.ChatButton })));
     const [state, dispatch]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();
     const { buttonProps, outOfOfficeButtonProps, startChat } = props;
     //Setting OutOfOperatingHours Flag
@@ -90,13 +88,11 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
     }, []);
 
     return (
-        <Suspense fallback={<div>Loading..</div>}>
-            <ChatButton
-                componentOverrides={buttonProps?.componentOverrides}
-                controlProps={outOfOperatingHours ? outOfOfficeControlProps : controlProps}
-                styleProps={outOfOperatingHours ? outOfOfficeStyleProps : buttonProps?.styleProps}
-            />
-        </Suspense>
+        <ChatButton
+            componentOverrides={buttonProps?.componentOverrides}
+            controlProps={outOfOperatingHours ? outOfOfficeControlProps : controlProps}
+            styleProps={outOfOperatingHours ? outOfOfficeStyleProps : buttonProps?.styleProps}
+        />
     );
 };
 
