@@ -18,6 +18,8 @@ import useChatContextStore from "../../hooks/useChatContextStore";
 
 export const HeaderStateful = (props: IHeaderStatefulParams) => {
 
+    console.log("HeaderStateful being called");
+
     //const Header = lazy(() => import(/* webpackChunkName: "CallingContainer" */ "@microsoft/omnichannel-chat-components").then(module => ({ default: module.Header })));
 
     const [state, dispatch]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();

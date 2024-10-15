@@ -17,6 +17,7 @@ import { setFocusOnElement } from "../../common/utils";
 import useChatContextStore from "../../hooks/useChatContextStore";
 
 export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
+    console.log("ChatButtonStateful being called");
     //const ChatButton = lazy(() => import(/* webpackChunkName: "ChatButton" */ "@microsoft/omnichannel-chat-components").then((module) => ({ default: module.ChatButton })));
     const [state, dispatch]: [ILiveChatWidgetContext, Dispatch<ILiveChatWidgetAction>] = useChatContextStore();
     const { buttonProps, outOfOfficeButtonProps, startChat } = props;

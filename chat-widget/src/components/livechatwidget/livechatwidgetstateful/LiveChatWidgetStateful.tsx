@@ -746,9 +746,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
                             )}
 
                             {!livechatProps.controlProps?.hideProactiveChatPane && shouldShowProactiveChatPane(state) && (decodeComponentString(livechatProps.componentOverrides?.proactiveChatPane) || 
-                            
                             <ProactiveChatPaneStateful proactiveChatProps={livechatProps.proactiveChatPaneProps} startChat={prepareStartChatRelay} />
-                            
                             )}
 
                             {!livechatProps.controlProps?.hideHeader && shouldShowHeader(state) && (decodeComponentString(livechatProps.componentOverrides?.header) ||
@@ -796,7 +794,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
                             )}
 
                             {shouldShowPostChatSurveyPane(state) && (decodeComponentString(livechatProps.componentOverrides?.postChatSurveyPane) ||
-                                <PostChatSurveyPaneStateful {...livechatProps.postChatSurveyPaneProps} {...livechatProps.chatSDK} />
+                                < PostChatSurveyPaneStateful {...livechatProps.postChatSurveyPaneProps} {...livechatProps.chatSDK} />
                             )}
 
                             {createFooter(livechatProps, state)}
