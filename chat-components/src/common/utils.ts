@@ -4,7 +4,7 @@ import { AdaptiveCard } from "adaptivecards";
 import { BroadcastService } from "../services/BroadcastService";
 import { ICustomEvent } from "../interfaces/ICustomEvent";
 import { ReactNode } from "react";
-import { decodeComponentString } from "..";
+import { decodeComponentString } from "./decodeComponentString";
 
 export const uuidv4 = (): string => {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
