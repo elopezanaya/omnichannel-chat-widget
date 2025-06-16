@@ -1,5 +1,6 @@
 import { LogLevel, TelemetryEvent } from "../../common/telemetry/TelemetryConstants";
 import React, { Dispatch, useEffect, useRef, useState } from "react";
+import { TelemetryManager, TelemetryTimers } from "../../common/telemetry/TelemetryManager";
 import { createTimer, setFocusOnElement } from "../../common/utils";
 
 import { ChatButton } from "@microsoft/omnichannel-chat-components";
@@ -13,7 +14,6 @@ import { ILiveChatWidgetContext } from "../../contexts/common/ILiveChatWidgetCon
 import { ITimer } from "../../common/interfaces/ITimer";
 import { LiveChatWidgetActionType } from "../../contexts/common/LiveChatWidgetActionType";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
-import { TelemetryTimers } from "../../common/telemetry/TelemetryManager";
 import { defaultOutOfOfficeChatButtonStyleProps } from "./common/styleProps/defaultOutOfOfficeChatButtonStyleProps";
 import useChatContextStore from "../../hooks/useChatContextStore";
 
@@ -40,7 +40,8 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
     ref.current = async () => {
         TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
             Event: TelemetryEvent.LCWChatButtonClicked,
-            Description: "Chat button click action started"
+            Description: "Chat button click action started",
+            runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId
         });
         
         if (state.appStates.isMinimized) {

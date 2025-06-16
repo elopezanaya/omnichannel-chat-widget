@@ -13,6 +13,7 @@ import { ILiveChatWidgetContext } from "../../contexts/common/ILiveChatWidgetCon
 import { ITimer } from "../../common/interfaces/ITimer";
 import { LiveChatWidgetActionType } from "../../contexts/common/LiveChatWidgetActionType";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
+import { TelemetryManager } from "../../common/telemetry/TelemetryManager";
 import { createTimer } from "../../common/utils";
 import { defaultOutOfOfficeHeaderStyleProps } from "./common/styleProps/defaultOutOfOfficeHeaderStyleProps";
 import useChatAdapterStore from "../../hooks/useChatAdapterStore";
@@ -47,6 +48,7 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
         onMinimizeClick: () => {
             TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
                 Event: TelemetryEvent.HeaderMinimizeButtonClicked,
+                runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId,
                 Description: "Header Minimize action started."
             });
 
@@ -61,6 +63,7 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
         onCloseClick: async () => {
             TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
                 Event: TelemetryEvent.HeaderCloseButtonClicked,
+                runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId,
                 Description: "Header Close action started."
             });
 

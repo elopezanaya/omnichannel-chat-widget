@@ -54,7 +54,8 @@ export interface ILiveChatWidgetContext {
         conversationEndedBy: ConversationEndEntity; // The entity that ends conversation
         chatDisconnectEventReceived: boolean; // true when customer disconnect event is received
         selectedSurveyMode: string | null; // selected survey mode
-        postChatParticipantType: undefined | ParticipantType; // participant type to render post chat survey
+        postChatParticipantType: undefined | ParticipantType; // participant type to render post chat survey;
+        ping : boolean; // true if ping is enabled
     };
     uiStates: {
         showConfirmationPane: boolean; // true if the confirmation pane should show

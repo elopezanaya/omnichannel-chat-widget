@@ -115,6 +115,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     const [voiceVideoCallingSDK, setVoiceVideoCallingSDK] = useState<any>(undefined);
     const { Composer } = Components;
     const canStartProactiveChat = useRef(true);
+    const detectedMultitab = useRef(false);
 
     // Process general styles
     const generalStyles: IStackStyles = {
@@ -267,6 +268,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     // useEffect for when skip chat button rendering
     useEffect(() => {
+        console.log("[hideStartChatButton Change] : LiveChatWidgetStateful useEffect - state.appStates.hideStartChatButton:", state?.appStates?.hideStartChatButton);
         if (state?.appStates?.hideStartChatButton === true) {
             //handle OOH pane
             if (state.appStates.outsideOperatingHours === true) {
@@ -290,8 +292,10 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     // useEffect for custom context
     useEffect(() => {
+        console.log("[Set Listeners] : LiveChatWidgetStateful useEffect - state.domainStates.customContext:", state?.domainStates?.customContext);
         // Add the custom context on receiving the SetCustomContext event
         BroadcastService.getMessageByEventName(BroadcastEvent.SetCustomContext).subscribe((msg: ICustomEvent) => {
+            console.log("SetCustomContext event received", msg);
             TelemetryHelper.logActionEvent(LogLevel.INFO, {
                 Event: TelemetryEvent.CustomContextReceived,
                 Description: "CustomContext received."
@@ -301,6 +305,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
         BroadcastService.getMessageByEventName(BroadcastEvent.StartProactiveChat).subscribe((msg: ICustomEvent) => {
 
+            console.log("StartProactiveChat event received", msg);
             TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
                 Event: TelemetryEvent.StartProactiveChatEventReceived,
                 Description: "Start proactive chat event received."
@@ -318,8 +323,13 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
         // Toggle chat visibility
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         BroadcastService.getMessageByEventName(BroadcastEvent.HideChatVisibilityChangeEvent).subscribe(async (event: any) => {
+            console.log("HideChatVisibilityChangeEvent event received", event);
+            dispatch({ type: LiveChatWidgetActionType.PING, payload: !state.appStates.ping });
+
             if (event?.payload?.isChatHidden !== undefined) {
+                console.log("HideChatVisibilityChangeEvent event received - isChatHidden:", event?.payload?.isChatHidden);
                 if (props.controlProps?.hideStartChatButton) {
+                    console.warn("HideChatVisibilityChangeEvent event received - hideStartChatButton is set to true, ignoring the event");
                     dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: event?.payload?.isChatHidden });
                 }
                 const dateNow = Date.now();
@@ -351,6 +361,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
         });
 
         BroadcastService.getMessageByEventName(BroadcastEvent.NetworkReconnected).subscribe(async () => {
+            console.log("NetworkReconnected event received");   
             const inMemoryState = executeReducer(state, { type: LiveChatWidgetActionType.GET_IN_MEMORY_STATE, payload: null });
             if (isThisSessionPopout(window?.location?.href) || inMemoryState?.appStates?.conversationState !== ConversationState.Active) {
                 return;
@@ -379,11 +390,14 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
          * the event is expected to be emitted from scripting layer.
          */
         BroadcastService.getMessageByEventName(BroadcastEvent.SyncMinimize).subscribe((msg: ICustomEvent) => {
+            console.log("SyncMinimize event received", msg);
             dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: msg?.payload?.minimized });
         });
 
-        // Start chat from SDK Event
+        // Start chat from SDK Event ANAYA
         BroadcastService.getMessageByEventName(BroadcastEvent.StartChat).subscribe((msg: ICustomEvent) => {  
+
+            console.log("StartChat event received", msg);
             // If chat is out of operating hours chat widget sets the conversation state to OutOfOffice.
             if (state.appStates.outsideOperatingHours === true) {
                 dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: false });
@@ -392,7 +406,42 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
             }
             // If the startChat event is not initiated by the same tab. Ignore the call
             if (!isNullOrUndefined(msg?.payload?.runtimeId) && msg?.payload?.runtimeId !== TelemetryManager.InternalTelemetryData.lcwRuntimeId) {
+                console.log("StartChat event ignored - different runtimeId", msg);
+                detectedMultitab.current = true;
                 return;
+            }
+            
+            if (detectedMultitab.current === true) {
+                // check if conversation was started somewhere else
+                const widgetCacheId = getWidgetCacheIdfromProps(props);
+                const cacheTtlInMins = props?.controlProps?.cacheTtlInMins ?? Constants.CacheTtlInMinutes;
+                const storageType = props?.useSessionStorage === true ? StorageType.sessionStorage : StorageType.localStorage;
+                const initialState = defaultClientDataStoreProvider(cacheTtlInMins, storageType).getData(widgetCacheId);
+
+                const initialStateFromCache: ILiveChatWidgetContext = JSON.parse(initialState);
+
+                console.log("StartChat event received - checking conversation state from cache", initialStateFromCache);
+
+                if (initialStateFromCache.appStates.conversationState !== ConversationState.Closed) {
+                    console.log("StartChat event ignored - conversation already started in another tab");
+                    dispatch({ type: LiveChatWidgetActionType.PING, payload: !state.appStates.ping });
+                    /*dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: false });
+                    dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_STATE, payload: initialStateFromCache.appStates.conversationState });
+                    
+                    BroadcastService.postMessage({
+                        eventName: BroadcastEvent.MaximizeChat,
+                        payload: {
+                            height: state?.domainStates?.widgetSize?.height,
+                            width: state?.domainStates?.widgetSize?.width,
+                            runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId
+                        }
+                    });
+
+                    detectedMultitab.current = false;
+                    console.log("StartChat event ignored - conversation already started in another tab", msg);
+                    return;
+                    */
+                }
             }
 
             if (msg?.payload?.customContext) {
@@ -423,6 +472,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
             * Maximization has been added as part of the initialization chat, since it wont go further than this block.
             **/ 
             if (inMemoryState.appStates?.conversationState === ConversationState.Closed) {
+                console.log("StartChat event received - Starting a new chat");
                 BroadcastService.postMessage({
                     eventName: BroadcastEvent.ChatInitiated
                 });
@@ -430,22 +480,28 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
                 return;
             }
 
+            console.log("StartChat event received - Maximizing chat");
+
             // If minimized, maximize the chat
-            if (inMemoryState?.appStates?.isMinimized === true || inMemoryState?.appStates?.isMinimized === undefined) {
-                dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: false });
-                BroadcastService.postMessage({
-                    eventName: BroadcastEvent.MaximizeChat,
-                    payload: {
-                        height: inMemoryState?.domainStates?.widgetSize?.height,
-                        width: inMemoryState?.domainStates?.widgetSize?.width
-                    }
-                });
-                return;
-            }
+            //if (inMemoryState?.appStates?.isMinimized === true || inMemoryState?.appStates?.isMinimized === undefined) {
+            console.log("Stateful Max : 2 = StartChat event received - Maximizing chat from minimized state");
+            dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: false });
+            BroadcastService.postMessage({
+                eventName: BroadcastEvent.MaximizeChat,
+                payload: {
+                    height: inMemoryState?.domainStates?.widgetSize?.height,
+                    width: inMemoryState?.domainStates?.widgetSize?.width,
+                    runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId
+                }
+            });
+            console.log("StartChat event received - Returning");
+            return;
+            //}
         });
 
         // End chat
         BroadcastService.getMessageByEventName(BroadcastEvent.InitiateEndChat).subscribe(async () => {
+            console.log("InitiateEndChat event received");
             TelemetryHelper.logSDKEventToAllTelemetry(LogLevel.INFO, {
                 Event: TelemetryEvent.EndChatEventReceived,
                 Description: "Received InitiateEndChat BroadcastEvent."
@@ -479,6 +535,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
         // End chat on browser unload
         BroadcastService.getMessageByEventName(BroadcastEvent.InitiateEndChatOnBrowserUnload).subscribe(() => {
+            console.log("InitiateEndChatOnBrowserUnload event received");
             initiateEndChatOnBrowserUnload();
         });
 
@@ -489,6 +546,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
             props.controlProps?.widgetInstanceId ?? "");
 
         BroadcastService.getMessageByEventName(endChatEventName).subscribe((msg: ICustomEvent) => {
+            console.log("EndChat event received", msg);
             if (msg?.payload?.runtimeId !== TelemetryManager.InternalTelemetryData.lcwRuntimeId) {
                 TelemetryHelper.logSDKEvent(LogLevel.INFO, {
                     Event: TelemetryEvent.PrepareEndChat,
@@ -503,11 +561,13 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
         //Listen to WidgetSize, used for minimize to maximize
         BroadcastService.getMessageByEventName("WidgetSize").subscribe((msg: ICustomEvent) => {
+            console.log("WidgetSize event received", msg);
             dispatch({ type: LiveChatWidgetActionType.SET_WIDGET_SIZE, payload: msg?.payload });
         });
 
         // Reset state variables
         BroadcastService.getMessageByEventName(BroadcastEvent.RaiseErrorEvent).subscribe(() => {
+            console.log("RaiseErrorEvent event received");
             dispatch({ type: LiveChatWidgetActionType.SET_LIVE_CHAT_CONFIG, payload: undefined });
             dispatch({ type: LiveChatWidgetActionType.SET_CUSTOM_CONTEXT, payload: undefined });
             dispatch({ type: LiveChatWidgetActionType.SET_CHAT_TOKEN, payload: undefined });
@@ -523,6 +583,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     }, []);
 
     useEffect(() => {
+        console.log("[Conversation State Change] : LiveChatWidgetStateful useEffect - state.appStates.conversationState:", state.appStates.conversationState);
         // On new message
         if (state.appStates.conversationState === ConversationState.Active) {
             facadeChatSDK?.onNewMessage(() => {
@@ -557,12 +618,14 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     }, [state.appStates.conversationState]);
 
     useEffect(() => {
+        console.log("[Conversation State Change : 2] : LiveChatWidgetStateful useEffect - state.appStates.proactiveChatStates.proactiveChatInNewWindow:", state.appStates.proactiveChatStates.proactiveChatInNewWindow);
         canStartProactiveChat.current = state.appStates.conversationState === ConversationState.Closed &&
             !state.appStates.proactiveChatStates.proactiveChatInNewWindow;
     }, [state.appStates.conversationState, state.appStates.proactiveChatStates.proactiveChatInNewWindow]);
 
     // Reset the UnreadMessageCount when minimized is toggled and broadcast it.
     useEffect(() => {
+        console.log("[Minimized State Change] : LiveChatWidgetStateful useEffect - state.appStates.isMinimized:", state.appStates.isMinimized);
         if (state.appStates.isMinimized) {
             ActivityStreamHandler.cork();
         } else {
@@ -573,6 +636,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     // Broadcast the UnreadMessageCount state on any change.
     useEffect(() => {
+        console.log("[UnreadMessageCount Change] : LiveChatWidgetStateful useEffect - state.appStates.unreadMessageCount:", state.appStates.unreadMessageCount);
         if (state.appStates.isMinimized === true && state.appStates.unreadMessageCount > 0) {
             const customEvent: ICustomEvent = {
                 elementType: ElementType.Custom,
@@ -593,6 +657,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     }, [state.appStates.unreadMessageCount]);
 
     useEffect(() => {
+        console.log("[webChatStyles State Change] : LiveChatWidgetStateful useEffect - state.appStates.conversationState:", state.appStates.conversationState);
         setWebChatStyles({
             ...webChatStyles,
             ...props.webChatContainerProps?.webChatStyles
@@ -600,6 +665,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     }, [props.webChatContainerProps?.webChatStyles]);
 
     useEffect(() => {
+        console.log("[Confirmation State Change] : LiveChatWidgetStateful useEffect - state.domainStates.confirmationState:", state.domainStates.confirmationState);
         //Confirmation pane dismissing through OK option, so proceed with end chat
         if (state.domainStates.confirmationState === ConfirmationState.Ok) {
             dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_ENDED_BY, payload: ConversationEndEntity.Customer });
@@ -607,6 +673,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
     }, [state.domainStates.confirmationState]);
 
     useEffect(() => {
+        console.log("[Conversation Ended By Change] : LiveChatWidgetStateful useEffect - state.appStates.conversationEndedBy:", state.appStates.conversationEndedBy);
         // Do not process anything during initialization
         if (state?.appStates?.conversationEndedBy === ConversationEndEntity.NotSet) {
             return;
@@ -644,6 +711,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     // Publish chat widget state
     useEffect(() => {
+        console.log("[Chat Widget State Change] : LiveChatWidgetStateful useEffect - state:", state);
         // Only activate these windows events when conversation state is active and chat widget is in popout mode
         // Ghost chat scenarios
         /* COMMENTING THIS CODE FOR PARITY WITH OLD LCW
@@ -675,6 +743,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     // Handle Chat disconnect cases
     useEffect(() => {
+        console.log("[Chat Disconnect Event Change] : LiveChatWidgetStateful useEffect - state.appStates.chatDisconnectEventReceived:", state.appStates.chatDisconnectEventReceived);
         const inMemoryState = executeReducer(state, { type: LiveChatWidgetActionType.GET_IN_MEMORY_STATE, payload: null });
         handleChatDisconnect(props, inMemoryState, setWebChatStyles);
         const chatDisconnectState = inMemoryState?.appStates?.chatDisconnectEventReceived;
@@ -695,6 +764,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     // if props state gets updates we need to update the renderingMiddlewareProps in the state
     useEffect(() => {
+        console.log("[Rendering Middleware Props Change] : LiveChatWidgetStateful useEffect - props.webChatContainerProps.renderingMiddlewareProps:", props.webChatContainerProps?.renderingMiddlewareProps);
         dispatch({ type: LiveChatWidgetActionType.SET_RENDERING_MIDDLEWARE_PROPS, payload: props.webChatContainerProps?.renderingMiddlewareProps });
     }, [props.webChatContainerProps?.renderingMiddlewareProps]);
 
@@ -769,7 +839,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     const directLine = livechatProps.webChatContainerProps?.directLine ?? adapter ?? defaultWebChatContainerStatefulProps.directLine;
     const userID = directLine.getState ? directLine?.getState("acs.userId") : "teamsvisitor";
-
+    console.log("[LiveChatWidgetStateful]");
     // WebChat's Composer can only be rendered if a directLine object is defined
     return directLine && (
         <>

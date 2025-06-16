@@ -40,6 +40,8 @@ export const getLiveChatWidgetContextInitialState = (props: ILiveChatWidgetProps
         initialStateFromCache.domainStates.liveChatConfig = props.chatConfig;
         // Cache the result of isOutsideOperatingHours() to ensure consistency
         initialStateFromCache.appStates.outsideOperatingHours = outsideOperatingHours;
+
+        console.log("LiveChatWidgetContextInitialState - Loaded from cache:", initialStateFromCache);
         return initialStateFromCache;
     }
 

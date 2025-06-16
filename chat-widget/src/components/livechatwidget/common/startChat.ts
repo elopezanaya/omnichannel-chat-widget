@@ -1,5 +1,6 @@
 import { BroadcastEvent, LogLevel, TelemetryEvent } from "../../../common/telemetry/TelemetryConstants";
 import { Constants, LiveWorkItemState, WidgetLoadTelemetryMessage } from "../../../common/Constants";
+import { TelemetryManager, TelemetryTimers } from "../../../common/telemetry/TelemetryManager";
 import { checkContactIdError, createTimer, getConversationDetailsCall, getStateFromCache, getWidgetCacheIdfromProps, isNullOrEmptyString, isNullOrUndefined, isUndefinedOrEmpty } from "../../../common/utils";
 import { handleChatReconnect, isPersistentEnabled, isReconnectEnabled } from "./reconnectChatHelper";
 import { handleStartChatError, logWidgetLoadComplete } from "./startChatErrorHandler";
@@ -15,7 +16,6 @@ import { ILiveChatWidgetProps } from "../interfaces/ILiveChatWidgetProps";
 import { LiveChatWidgetActionType } from "../../../contexts/common/LiveChatWidgetActionType";
 import StartChatOptionalParams from "@microsoft/omnichannel-chat-sdk/lib/core/StartChatOptionalParams";
 import { TelemetryHelper } from "../../../common/telemetry/TelemetryHelper";
-import { TelemetryTimers } from "../../../common/telemetry/TelemetryManager";
 import { chatSDKStateCleanUp } from "./endChat";
 import { createAdapter } from "./createAdapter";
 import { createOnNewAdapterActivityHandler } from "../../../plugins/newMessageEventHandler";
@@ -39,10 +39,13 @@ const prepareStartChat = async (props: ILiveChatWidgetProps, facadeChatSDK: Faca
     optionalParams = {}; //Resetting to ensure no stale values
     widgetInstanceId = getWidgetCacheIdfromProps(props);
 
+    console.log("prepareStartChat called with widgetInstanceId: ", widgetInstanceId);
     // reconnect > chat from cache
     if (isReconnectEnabled(props.chatConfig) === true && !isPersistentEnabled(props.chatConfig)) {
+        console.log("Reconnect enabled, checking for chat reconnect...");
         const shouldStartChatNormally = await handleChatReconnect(facadeChatSDK, props, dispatch, setAdapter, initStartChat, state);
         if (!shouldStartChatNormally) {
+            console.log("Chat reconnect handled, not starting chat normally.");
             return;
         }
     }
@@ -52,8 +55,10 @@ const prepareStartChat = async (props: ILiveChatWidgetProps, facadeChatSDK: Faca
         return;
     }
 
+    console.log("Checking if conversation is still valid...");
     // Can connect to existing chat session
     if (await canConnectToExistingChat(props, facadeChatSDK, state, dispatch, setAdapter)) {
+        console.log("Connected to existing chat session.");
         return;
     }
 
@@ -95,13 +100,16 @@ const setPreChatAndInitiateChat = async (facadeChatSDK: FacadeChatSDK, dispatch:
             // If minimized, maximize the chat, if the state is missing, consider it as minimized
             if (state?.appStates.isMinimized === undefined || state?.appStates?.isMinimized === true) {
                 dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: false });
+                console.warn("Maximizing 1 chat widget as it was minimized before starting chat.");
+
 
                 // this event will notify the upper layer to maximize the widget, an event missing during multi-tab scenario.
                 BroadcastService.postMessage({
                     eventName: BroadcastEvent.MaximizeChat,
                     payload: {
                         height: state?.domainStates?.widgetSize?.height,
-                        width: state?.domainStates?.widgetSize?.width
+                        width: state?.domainStates?.widgetSize?.width,
+                        runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId
                     }
                 });
             }
@@ -119,13 +127,15 @@ const setPreChatAndInitiateChat = async (facadeChatSDK: FacadeChatSDK, dispatch:
      * This is because a new change to control OOH as closed event when a widget is coming from chat.
      */
     if (state?.appStates.isMinimized === undefined || state?.appStates?.isMinimized === true) {
+        console.warn("Maximizing 0 chat widget as it was minimized before starting chat.");
         dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: false });
         // this event will notify the upper layer to maximize the widget, an event missing during multi-tab scenario.
         BroadcastService.postMessage({
             eventName: BroadcastEvent.MaximizeChat,
             payload: {
                 height: state?.domainStates?.widgetSize?.height,
-                width: state?.domainStates?.widgetSize?.width
+                width: state?.domainStates?.widgetSize?.width,
+                runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId
             }
         });
     }
@@ -140,7 +150,10 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
     let isStartChatSuccessful = false;
     const persistentChatEnabled = await isPersistentChatEnabled(state?.domainStates?.liveChatConfig?.LiveWSAndLiveChatEngJoin?.msdyn_conversationmode);
 
-    if (state?.appStates.conversationState === ConversationState.Closed) {
+    console.log("initStartChat called with persistentChatEnabled: ", persistentChatEnabled);
+    console.log("initStartChat: Current conversation persisted state ", persistedState);
+    if (persistedState?.appStates?.conversationState !== ConversationState.Active && state?.appStates.conversationState === ConversationState.Closed) {
+        console.log("**** initStartChat: Conversation state is Closed, resetting chat SDK state.");
         // Preventive reset to avoid starting chat with previous requestId which could potentially cause problems
         chatSDKStateCleanUp(facadeChatSDK.getChatSDK());
     }
@@ -157,8 +170,11 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
             Description: "Widget start chat started."
         });
 
+        console.log("initStartChat: Starting chat...", persistedState, params);
+
         //Check if chat retrieved from cache
         if (persistedState || params?.liveChatContext) {
+            console.log("*** initStartChat: Chat retrieved from cache or params.");
             BroadcastService.postMessage({
                 eventName: BroadcastEvent.ChatRetrievedFromCache,
                 payload: {
@@ -167,6 +183,8 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
                 }
             });
         }
+
+        console.log("initStartChat: 2");
 
         try {
             // Set custom context params
@@ -177,7 +195,9 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
                 portalContactId: window.Microsoft?.Dynamic365?.Portal?.User?.contactId
             };
             const startChatOptionalParams: StartChatOptionalParams = Object.assign({}, params, optionalParams, defaultOptionalParams);
+            console.log("**********  initStartChat: ************", startChatOptionalParams);
             await facadeChatSDK.startChat(startChatOptionalParams);
+            console.log("**********  initStartChat: DONE ************", startChatOptionalParams);
             isStartChatSuccessful = true;
         } catch (error) {
             checkContactIdError(error);
@@ -202,6 +222,7 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
 
         // Set app state to Active
         if (isStartChatSuccessful) {
+            console.log("initStartChat: Chat started successfully, setting app state to Active.");
             ActivityStreamHandler.uncork();
             // Update start chat failure app state if chat loads successfully
             dispatch({ type: LiveChatWidgetActionType.SET_START_CHAT_FAILING, payload: false });
@@ -209,6 +230,7 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
         }
         
         if (persistedState) {
+            console.log("*** initStartChat: Setting persisted state in widget context.");
             dispatch({ type: LiveChatWidgetActionType.SET_WIDGET_STATE, payload: persistedState });
             logWidgetLoadComplete(WidgetLoadTelemetryMessage.PersistedStateRetrievedMessage);
             // Set post chat context in state, load in background to do not block the load
@@ -251,22 +273,44 @@ const createAdapterAndSubscribe = async (facadeChatSDK: FacadeChatSDK, dispatch:
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const canConnectToExistingChat = async (props: ILiveChatWidgetProps, facadeChatSDK: FacadeChatSDK, state: ILiveChatWidgetContext, dispatch: Dispatch<ILiveChatWidgetAction>, setAdapter: any) => {
+
+    console.log("canConnectToExistingChat : Checking if can connect to existing chat...");
     // By pass this function in case of popout chat
     if (state?.appStates?.hideStartChatButton === true) {
+        console.log("canConnectToExistingChat : Skipping connection to existing chat as hideStartChatButton is true.");
         return false;
     }
 
+    console.log("canConnectToExistingChat : Getting persisted state from cache...");
     const persistedState = getStateFromCache(getWidgetCacheIdfromProps(props));
+    console.log("canConnectToExistingChat : Persisted state retrieved: ", persistedState);
 
     //Connect to only active chat session
     if (persistedState &&
         !isUndefinedOrEmpty(persistedState?.domainStates?.liveChatContext) &&
         persistedState?.appStates?.conversationState === ConversationState.Active) {
+        console.log("canConnectToExistingChat : **** EXISTING CHAT FOUND *****");
         dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_STATE, payload: ConversationState.Loading });
+        
+        if (state.appStates.isMinimized === undefined || state.appStates.isMinimized === true) {
+
+            console.warn("Maximizing 2 chat widget as it was minimized before starting chat.");
+            dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: false });
+            // If the chat is minimized, we need to restore it before connecting
+            BroadcastService.postMessage({
+                eventName: BroadcastEvent.MaximizeChat,
+                payload: {
+                    height: state?.domainStates?.widgetSize?.height,
+                    width: state?.domainStates?.widgetSize?.width,
+                    runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId
+                }
+            });
+        }
         const optionalParams = { liveChatContext: persistedState?.domainStates?.liveChatContext };
         await initStartChat(facadeChatSDK, dispatch, setAdapter, state, props, optionalParams, persistedState);
         return true;
     }
+    console.log("canConnectToExistingChat : No existing chat found in cache, checking if conversation is still valid...");
     return false;
 };
 

@@ -31,6 +31,23 @@ const reducer = (state: ILiveChatWidgetContext, action: ILiveChatWidgetAction): 
     }
 
     switch (action.type) {
+        case LiveChatWidgetActionType.PING:
+            inMemory = {
+                ...inMemory,
+                appStates: {
+                    ...inMemory.appStates,
+                    ping: action.payload as boolean
+                }
+            };
+
+            return {
+                ...state,
+                appStates: {
+                    ...state.appStates,
+                    ping: action.payload as boolean
+                }
+            };
+            
         case LiveChatWidgetActionType.SET_WIDGET_ELEMENT_ID:
             inMemory = {
                 ...inMemory,
