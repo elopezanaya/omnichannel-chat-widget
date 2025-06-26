@@ -22,6 +22,7 @@ export interface TelemetryEventWrapper {
     Data?: any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     CustomProperties?: any;
+    runtimeId?: string;
 }
 
 export class TelemetryHelper {

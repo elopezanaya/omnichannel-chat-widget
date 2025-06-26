@@ -288,6 +288,7 @@ export enum TelemetryEvent {
 
     AppInsightsInitialized = "AppInsightsInitialized",
     AppInsightsInitFailed = "AppInsightsInitFailed",
+    StateSynchronization = "StateSynchronization",
 
 }
 

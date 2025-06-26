@@ -2,77 +2,238 @@ import { ConversationState } from "../contexts/common/ConversationState";
 import { ILiveChatWidgetContext } from "../contexts/common/ILiveChatWidgetContext";
 
 export const shouldShowChatButton = (state: ILiveChatWidgetContext) => {
-    return (state.appStates.isMinimized ||
-        (state.appStates.conversationState === ConversationState.Closed))
-        && state?.appStates?.hideStartChatButton === false; // Do not show chat button in case of popout
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    const hideStartChatButton = state?.appStates?.hideStartChatButton;
+    
+    console.log("[CHAT_BUTTON] Values:", { isMinimized, conversationState, hideStartChatButton });
+    
+    const result = (isMinimized ||
+        (conversationState === ConversationState.Closed))
+        && hideStartChatButton === false;
+    
+    console.log("[CHAT_BUTTON] Result:", result);
+    return result;
 };
 
 export const shouldShowProactiveChatPane = (state: ILiveChatWidgetContext) => {
-    return !state.appStates.isMinimized &&
-        (state.appStates.conversationState === ConversationState.ProactiveChat);
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[PROACTIVE_PANE] Values:", { isMinimized, conversationState });
+    
+    const result = !isMinimized &&
+        (conversationState === ConversationState.ProactiveChat);
+    
+    console.log("[PROACTIVE_PANE] Result:", result);
+    return result;
 };
 
 export const shouldShowHeader = (state: ILiveChatWidgetContext) => {
-    return !state.appStates.isMinimized &&
-        (state.appStates.conversationState !== ConversationState.Closed &&
-            state.appStates.conversationState !== ConversationState.ProactiveChat);
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[HEADER] Values:", { 
+        isMinimized, 
+        conversationState, 
+        notClosed: conversationState !== ConversationState.Closed,
+        notProactive: conversationState !== ConversationState.ProactiveChat 
+    });
+    
+    const result = !isMinimized &&
+        (conversationState !== ConversationState.Closed &&
+            conversationState !== ConversationState.ProactiveChat);
+    
+    console.log("[HEADER] Result:", result);
+    return result;
 };
 
 export const shouldShowFooter = (state: ILiveChatWidgetContext) => {
-    return !state.appStates.isMinimized &&
-        (state.appStates.conversationState === ConversationState.Active ||
-            state.appStates.conversationState === ConversationState.InActive ||
-            state.appStates.conversationState === ConversationState.Postchat);
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[FOOTER] Values:", { 
+        isMinimized, 
+        conversationState,
+        isActive: conversationState === ConversationState.Active,
+        isInActive: conversationState === ConversationState.InActive,
+        isPostchat: conversationState === ConversationState.Postchat
+    });
+    
+    const result = !isMinimized &&
+        (conversationState === ConversationState.Active ||
+            conversationState === ConversationState.InActive ||
+            conversationState === ConversationState.Postchat);
+    
+    console.log("[FOOTER] Result:", result);
+    return result;
 };
 
 export const shouldShowEmailTranscriptPane = (state: ILiveChatWidgetContext) => {
-    return state.uiStates.showEmailTranscriptPane;
+    const showEmailTranscriptPane = state.uiStates.showEmailTranscriptPane;
+    
+    console.log("[EMAIL_TRANSCRIPT] Values:", { showEmailTranscriptPane });
+    console.log("[EMAIL_TRANSCRIPT] Result:", showEmailTranscriptPane);
+    
+    return showEmailTranscriptPane;
 };
 
 export const shouldShowWebChatContainer = (state: ILiveChatWidgetContext) => {
-    return ((!state.appStates.isMinimized) && state.appStates.conversationState === ConversationState.Active ||
-        state.appStates.conversationState === ConversationState.InActive);
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[WEBCHAT] Values:", { 
+        isMinimized, 
+        conversationState,
+        isActive: conversationState === ConversationState.Active,
+        isInActive: conversationState === ConversationState.InActive
+    });
+    
+    const result = ((!isMinimized) && conversationState === ConversationState.Active ||
+        conversationState === ConversationState.InActive);
+    
+    console.log("[WEBCHAT] Result:", result);
+    return result;
 };
 
 export const shouldShowLoadingPane = (state: ILiveChatWidgetContext) => {
-    return !state.appStates.isMinimized &&
-        (state.appStates.conversationState === ConversationState.Loading);
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[LOADING_PANE] Values:", { 
+        isMinimized, 
+        conversationState,
+        isLoading: conversationState === ConversationState.Loading
+    });
+    
+    const result = !isMinimized &&
+        (conversationState === ConversationState.Loading);
+    
+    console.log("[LOADING_PANE] Result:", result);
+    return result;
 };
 
 export const shouldShowStartChatErrorPane = (state: ILiveChatWidgetContext) => {
-    return !state.appStates.isMinimized &&
-        (state.appStates.conversationState === ConversationState.Error);
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[ERROR_PANE] Values:", { 
+        isMinimized, 
+        conversationState,
+        isError: conversationState === ConversationState.Error
+    });
+    
+    const result = !isMinimized &&
+        (conversationState === ConversationState.Error);
+    
+    console.log("[ERROR_PANE] Result:", result);
+    return result;
 };
 
 export const shouldShowReconnectChatPane = (state: ILiveChatWidgetContext) => {
-    return !state.appStates.isMinimized &&
-        (state.appStates.conversationState === ConversationState.ReconnectChat);
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[RECONNECT_PANE] Values:", { 
+        isMinimized, 
+        conversationState,
+        isReconnect: conversationState === ConversationState.ReconnectChat
+    });
+    
+    const result = !isMinimized &&
+        (conversationState === ConversationState.ReconnectChat);
+    
+    console.log("[RECONNECT_PANE] Result:", result);
+    return result;
 };
 
 export const shouldShowPostChatLoadingPane = (state: ILiveChatWidgetContext) => {
-    return !state.appStates.isMinimized &&
-        (state.appStates.conversationState === ConversationState.PostchatLoading);
+    const isMinimized = state.appStates.isMinimized;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[POSTCHAT_LOADING] Values:", { 
+        isMinimized, 
+        conversationState,
+        isPostchatLoading: conversationState === ConversationState.PostchatLoading
+    });
+    
+    const result = !isMinimized &&
+        (conversationState === ConversationState.PostchatLoading);
+    
+    console.log("[POSTCHAT_LOADING] Result:", result);
+    return result;
 };
 
 export const shouldShowOutOfOfficeHoursPane = (state: ILiveChatWidgetContext) => {
-    // Show OOOH pane only when the conversation state is Closed and outside operating hours is true
-    return !state.appStates.isMinimized &&
-        (state.appStates.outsideOperatingHours === true) && (state.appStates.conversationState === ConversationState.OutOfOffice);
+    const isMinimized = state.appStates.isMinimized;
+    const outsideOperatingHours = state.appStates.outsideOperatingHours;
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[OUT_OF_OFFICE] Values:", { 
+        isMinimized, 
+        outsideOperatingHours,
+        conversationState,
+        isOutOfOffice: conversationState === ConversationState.OutOfOffice
+    });
+    
+    const result = !isMinimized &&
+        (outsideOperatingHours === true) && 
+        (conversationState === ConversationState.OutOfOffice);
+    
+    console.log("[OUT_OF_OFFICE] Result:", result);
+    return result;
 };
 
 export const shouldShowPreChatSurveyPane = (state: ILiveChatWidgetContext) => {
-    return (state.appStates.conversationState === ConversationState.Prechat);
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[PRECHAT_SURVEY] Values:", { 
+        conversationState,
+        isPrechat: conversationState === ConversationState.Prechat
+    });
+    
+    const result = conversationState === ConversationState.Prechat;
+    
+    console.log("[PRECHAT_SURVEY] Result:", result);
+    return result;
 };
 
 export const shouldShowConfirmationPane = (state: ILiveChatWidgetContext) => {
-    return state.uiStates.showConfirmationPane;
+    const showConfirmationPane = state.uiStates.showConfirmationPane;
+    
+    console.log("[CONFIRMATION_PANE] Values:", { showConfirmationPane });
+    console.log("[CONFIRMATION_PANE] Result:", showConfirmationPane);
+    
+    return showConfirmationPane;
 };
 
 export const shouldShowPostChatSurveyPane = (state: ILiveChatWidgetContext) => {
-    return (state.appStates.conversationState === ConversationState.Postchat);
+    const conversationState = state.appStates.conversationState;
+    
+    console.log("[POSTCHAT_SURVEY] Values:", { 
+        conversationState,
+        isPostchat: conversationState === ConversationState.Postchat
+    });
+    
+    const result = conversationState === ConversationState.Postchat;
+    
+    console.log("[POSTCHAT_SURVEY] Result:", result);
+    return result;
 };
 
 export const shouldShowCallingContainer = (state: ILiveChatWidgetContext) => {
-    return (state.appStates.conversationState === ConversationState.Active) &&
-        state.appStates.e2vvEnabled;
+    const conversationState = state.appStates.conversationState;
+    const e2vvEnabled = state.appStates.e2vvEnabled;
+    
+    console.log("[CALLING_CONTAINER] Values:", { 
+        conversationState,
+        isActive: conversationState === ConversationState.Active,
+        e2vvEnabled
+    });
+    
+    const result = (conversationState === ConversationState.Active) &&
+        e2vvEnabled;
+    
+    console.log("[CALLING_CONTAINER] Result:", result);
+    return result;
 };

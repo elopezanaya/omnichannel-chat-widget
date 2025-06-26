@@ -378,6 +378,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
          * the event is expected to be emitted from scripting layer.
          */
         BroadcastService.getMessageByEventName(BroadcastEvent.SyncMinimize).subscribe((msg: ICustomEvent) => {
+            console.log("** SyncMinimize event received", JSON.stringify(msg.payload));
             dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: msg?.payload?.minimized });
         });
 
@@ -436,7 +437,8 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
                     eventName: BroadcastEvent.MaximizeChat,
                     payload: {
                         height: inMemoryState?.domainStates?.widgetSize?.height,
-                        width: inMemoryState?.domainStates?.widgetSize?.width
+                        width: inMemoryState?.domainStates?.widgetSize?.width,
+                        runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId
                     }
                 });
                 return;

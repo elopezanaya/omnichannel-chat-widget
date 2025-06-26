@@ -13,6 +13,7 @@ import { ILiveChatWidgetContext } from "../../contexts/common/ILiveChatWidgetCon
 import { ITimer } from "../../common/interfaces/ITimer";
 import { LiveChatWidgetActionType } from "../../contexts/common/LiveChatWidgetActionType";
 import { TelemetryHelper } from "../../common/telemetry/TelemetryHelper";
+import { TelemetryManager } from "../../common/telemetry/TelemetryManager";
 import { createTimer } from "../../common/utils";
 import { defaultOutOfOfficeHeaderStyleProps } from "./common/styleProps/defaultOutOfOfficeHeaderStyleProps";
 import useChatAdapterStore from "../../hooks/useChatAdapterStore";
@@ -47,7 +48,8 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
         onMinimizeClick: () => {
             TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
                 Event: TelemetryEvent.HeaderMinimizeButtonClicked,
-                Description: "Header Minimize action started."
+                Description: "Header Minimize action started.",
+                runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId,
             });
 
             dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: true });
@@ -61,7 +63,8 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
         onCloseClick: async () => {
             TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
                 Event: TelemetryEvent.HeaderCloseButtonClicked,
-                Description: "Header Close action started."
+                Description: "Header Close action started.",
+                runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId,
             });
 
             if (localConfirmationPaneState.current !== ConfirmationState.Ok) {
@@ -96,14 +99,18 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
         onMinimizeClick: () => {
             TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
                 Event: TelemetryEvent.HeaderMinimizeButtonClicked,
-                Description: "Header Minimize action started."
+                Description: "Header Minimize action started.",
+                runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId,
+
             });
 
             dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: true });
 
             TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
                 Event: TelemetryEvent.MinimizeChatActionCompleted, 
-                Description: "Header Minimize action completed."
+                Description: "Header Minimize action completed.",
+                runtimeId: TelemetryManager.InternalTelemetryData.lcwRuntimeId,
+
             });
         },
         ...outOfOfficeHeaderProps?.controlProps,
