@@ -249,7 +249,8 @@ export class TelemetryHelper {
             eventName,
             logLevel,
             payload: {
-                ...payload
+                ...payload,
+                runtimeId : TelemetryManager.InternalTelemetryData?.lcwRuntimeId,
             }
         };
         BroadcastService.postMessage(telemetryEvent);

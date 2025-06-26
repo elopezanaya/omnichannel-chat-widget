@@ -1,0 +1,11 @@
+{
+  "name": "chat-widget-build-helper",
+  "version": "1.0.0",
+  "description": "Build helper for the chat widget",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "node copilot-build.js --copilot-run",
+    "dracarys": "node dracarys.js dracarys"
+  }
+}

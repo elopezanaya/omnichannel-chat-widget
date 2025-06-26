@@ -1,0 +1,36 @@
+@copilot-prompt
+
+// COPILOT COMMAND: DRACARYS-BUILD
+// This file contains instructions for GitHub Copilot to build the chat widget
+// Simply open this file and say "dracarys" or type "dracarys" in the chat to start the build process
+
+// BUILD PROCESS INSTRUCTIONS:
+// 1. Clean up by removing all .tgz files in both source and destination directories
+// 2. Build the chat widget in the OCW-FORK repository
+// 3. Package it into a tgz file
+// 4. Copy the package to the CRM.OmniChannel.LiveChatWidget repository
+// 5. Install the package in the destination repository
+// 6. Run webpack build in the destination
+
+// SOURCE AND DESTINATION PATHS:
+const sourceDirectory = "C:\\src\\OCW-FORK\\omnichannel-chat-widget\\chat-widget";
+const destinationDirectory = "C:\\src\\CRM.OmniChannel.LiveChatWidget\\src";
+
+// IMPLEMENTATION NOTES:
+// - This process replaces the build-and-copy.bat script
+// - All build steps will be executed sequentially with proper error handling
+// - Progress will be reported in the terminal
+// - Any errors during the build process will be clearly displayed with details
+// - The process will stop immediately if any step fails
+
+## Command Name
+dracarys
+
+## Command Description
+Build and deploy the Omnichannel Chat Widget
+
+## Example Queries
+- "Build the chat widget"
+- "Run the widget build process" 
+- "dracarys"
+- "Deploy the chat widget locally"

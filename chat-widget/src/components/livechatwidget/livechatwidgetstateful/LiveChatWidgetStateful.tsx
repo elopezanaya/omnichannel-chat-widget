@@ -379,6 +379,10 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
          */
         BroadcastService.getMessageByEventName(BroadcastEvent.SyncMinimize).subscribe((msg: ICustomEvent) => {
             console.log("** SyncMinimize event received", JSON.stringify(msg.payload));
+            if (msg.payload.runtimeId !== TelemetryManager.InternalTelemetryData.lcwRuntimeId) {
+                console.log("** SyncMinimize event received from another tab, ignoring");
+                return;
+            }
             dispatch({ type: LiveChatWidgetActionType.SET_MINIMIZED, payload: msg?.payload?.minimized });
         });
 

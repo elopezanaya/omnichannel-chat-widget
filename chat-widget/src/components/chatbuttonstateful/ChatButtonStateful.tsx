@@ -35,14 +35,16 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
     //Setting OutOfOperatingHours Flag
     //Setting OutOfOperatingHours Flag - to string conversion to normalize the value (could be boolean from other states or string directly from config)
     const [outOfOperatingHours, setOutOfOperatingHours] = useState(state.appStates.outsideOperatingHours);
-    const ref = useRef(() => {return;});
-
-    ref.current = async () => {
-        console.log("Chat button clicked=>",TelemetryManager?.InternalTelemetryData?.lcwRuntimeId);
+    
+    // Create a memoized click handler function instead of using useRef
+    const handleChatButtonClick = useRef(async () => {
+        // Get the runtime ID at the time of the click, not when the component renders
+        const runtimeId = TelemetryManager?.InternalTelemetryData?.lcwRuntimeId;
+        console.log("Chat button clicked=>", runtimeId);
         TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
             Event: TelemetryEvent.LCWChatButtonClicked,
             Description: "Chat button click action started",
-            runtimeId: TelemetryManager?.InternalTelemetryData?.lcwRuntimeId
+            runtimeId: runtimeId
         });
         
         if (state.appStates.isMinimized) {
@@ -60,7 +62,7 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
             Event: TelemetryEvent.LCWChatButtonActionCompleted,
             Description: "Chat button action completed"
         });
-    };
+    }).current;
 
     const outOfOfficeStyleProps: IChatButtonStyleProps = Object.assign({}, defaultOutOfOfficeChatButtonStyleProps, outOfOfficeButtonProps?.styleProps);
     const controlProps: IChatButtonControlProps = {
@@ -70,7 +72,7 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
         subtitleText: "We're online.",
         hideNotificationBubble: buttonProps?.controlProps?.hideNotificationBubble === true || state.appStates.isMinimized === false,
         unreadMessageCount: state.appStates.unreadMessageCount ? (state.appStates.unreadMessageCount > Constants.maximumUnreadMessageCount ? props.buttonProps?.controlProps?.largeUnreadMessageString : state.appStates.unreadMessageCount.toString()) : "0",
-        onClick: () => ref.current(),
+        onClick: handleChatButtonClick,
         unreadMessageString: props.buttonProps?.controlProps?.unreadMessageString,
         ...buttonProps?.controlProps,
     };
@@ -90,12 +92,14 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
 
     useEffect(() => {
         setOutOfOperatingHours(state.appStates.outsideOperatingHours);
-        console.log("LCW Button Show:", TelemetryManager?.InternalTelemetryData?.lcwRuntimeId);
+        // Access runtime ID at the time this effect runs
+        const runtimeId = TelemetryManager?.InternalTelemetryData?.lcwRuntimeId;
+        console.log("LCW Button Show:", runtimeId);
         
         TelemetryHelper.logLoadingEvent(LogLevel.INFO, {
             Event: TelemetryEvent.LCWChatButtonShow,
             ElapsedTimeInMilliseconds: TelemetryTimers.LcwLoadToChatButtonTimer.milliSecondsElapsed,
-            runtimeId: TelemetryManager?.InternalTelemetryData?.lcwRuntimeId,
+            runtimeId: runtimeId,
         });
 
         if (state.uiStates.focusChatButton) {
