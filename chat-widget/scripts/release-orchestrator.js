@@ -4,63 +4,10 @@ import { execSync } from "child_process";
 import fs from "fs";
 import readline from "readline";
 
-// Helper function to print help information
-function printHelp() {
-    console.log(`
-=== OSS Release Orchestrator Help ===
-
-Usage: node release-orchestrator.js [options]
-
-Options:
-  --help, -h     Show this help message
-  --safety       Enable safety mode (requires triple confirmation for critical actions)
-
-Description:
-  The release orchestrator guides you through different release workflows:
-  1. Create an official release (tag and publish)
-  2. Prepare for next version after a release
-  3. Complete full release cycle (both steps above)
-  4. Create a hotfix release
-
-  Safety mode will require triple confirmation for critical operations
-  like tag creation and pushing to remote repositories.
-
-Important:
-  This script should always be run from the 'chat-widget' directory, not from
-  the 'scripts' directory. All commands will be executed in the context of
-  the 'chat-widget' directory.
-
-  Recommended usage:
-    cd omnichannel-chat-widget/chat-widget
-    yarn release         # Normal mode
-    yarn release:safe    # Safety mode (recommended)
-`);
-}
-
 // Parse command line arguments
 const args = process.argv.slice(2);
 const SAFETY_MODE = args.includes("--safety");
 const HELP_MODE = args.includes("--help") || args.includes("-h");
-
-// Print help and exit immediately if help mode is requested
-if (HELP_MODE) {
-    printHelp();
-    process.exit(0);
-}
-
-// Check current working directory
-const currentDir = process.cwd();
-if (!currentDir.endsWith("chat-widget")) {
-    console.warn("\x1b[33m⚠ WARNING: This script should be run from the 'chat-widget' directory.\x1b[0m");
-    console.warn("\x1b[33m⚠ Current directory: " + currentDir + "\x1b[0m");
-    console.warn("\x1b[33m⚠ Please change to the chat-widget directory and try again.\x1b[0m");
-    console.warn("\x1b[33m⚠ Recommended usage: cd omnichannel-chat-widget/chat-widget && yarn release\x1b[0m");
-    
-    // Only continue with help mode from the wrong directory
-    if (!HELP_MODE) {
-        process.exit(1);
-    }
-}
 
 class ReleaseOrchestrator {
     constructor() {
@@ -153,17 +100,6 @@ class ReleaseOrchestrator {
         } catch (error) {
             throw new Error("Not in a git repository");
         }
-        
-        // Check if running from the chat-widget directory
-        const currentDir = process.cwd();
-        if (!currentDir.endsWith("chat-widget")) {
-            this.printWarning("WARNING: This script should be run from the 'chat-widget' directory.");
-            this.printWarning("Current directory: " + currentDir);
-            const proceed = await this.promptYesNo("Continue anyway?");
-            if (!proceed) {
-                throw new Error("Script must be run from the chat-widget directory");
-            }
-        }
 
         // Check for package.json
         if (!fs.existsSync("./package.json")) {
@@ -251,7 +187,7 @@ class ReleaseOrchestrator {
             
             // Run yarn install to update dependencies and yarn.lock at the chat-widget level
             this.printInfo("Running yarn install to update dependencies at chat-widget level...");
-            execSync("yarn install", { stdio: "inherit" });
+            execSync("cd .. && yarn install", { stdio: "inherit" });
             
             // Add package.json and yarn.lock (this project uses yarn)
             execSync("git add package.json", { stdio: "inherit" });
@@ -350,7 +286,7 @@ class ReleaseOrchestrator {
             
             // Run yarn install to update dependencies and yarn.lock at the chat-widget level
             this.printInfo("Running yarn install to update dependencies at chat-widget level...");
-            execSync("yarn install", { stdio: "inherit" });
+            execSync("cd .. && yarn install", { stdio: "inherit" });
             
             // Add package.json and yarn.lock (this project uses yarn)
             execSync("git add package.json", { stdio: "inherit" });
@@ -425,8 +361,8 @@ class ReleaseOrchestrator {
         try {
             execSync(`yarn version --new-version ${confirmedVersion} --no-git-tag-version`, { stdio: "inherit" });
             
-            // Run yarn install to update dependencies and yarn.lock at the chat-widget level
-            this.printInfo("Running yarn install to update dependencies at chat-widget level...");
+            // Run yarn install to update dependencies and yarn.lock
+            this.printInfo("Running yarn install to update dependencies...");
             execSync("yarn install", { stdio: "inherit" });
             
             // Add package.json and yarn.lock (this project uses yarn)
@@ -862,7 +798,25 @@ class ReleaseOrchestrator {
 
 // Run the orchestrator
 if (HELP_MODE) {
-    // Help text already printed at the top
+    console.log(`
+=== OSS Release Orchestrator Help ===
+
+Usage: node release-orchestrator.js [options]
+
+Options:
+  --help, -h     Show this help message
+  --safety       Enable safety mode (requires triple confirmation for critical actions)
+
+Description:
+  The release orchestrator guides you through different release workflows:
+  1. Create an official release (tag and publish)
+  2. Prepare for next version after a release
+  3. Complete full release cycle (both steps above)
+  4. Create a hotfix release
+
+  Safety mode will require triple confirmation for critical operations
+  like tag creation and pushing to remote repositories.
+`);
 } else {
     const orchestrator = new ReleaseOrchestrator();
     orchestrator.start();
