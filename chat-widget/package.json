@@ -114,6 +114,8 @@
     "test:e2e:build": "yarn build-sample && cd automation_tests && yarn test",
     "test:visual": "jest -c jest.config.visual.cjs --verbose",
     "test:all": "yarn test:unit && yarn test:visual",
+    "release": "node scripts/release.js",
+    "release:safe": "node scripts/release.js --safety",
     "build:esm": "babel ./src --config-file ./babel.esm.config.json --out-dir lib/esm --extensions .ts,.js,.tsx --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx",
     "build:cjs": "babel ./src --config-file ./babel.config.json --out-dir lib/cjs --extensions .ts,.js,.tsx --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx",
     "build:esm:watch": "babel ./src --config-file ./babel.esm.config.json --out-dir lib/esm --extensions .ts,.js,.tsx --watch --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx",
