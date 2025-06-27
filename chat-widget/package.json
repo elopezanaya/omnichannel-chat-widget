@@ -132,7 +132,9 @@
     "clean": "rimraf lib",
     "dev": "concurrently \"yarn build:esm:watch\" \"webpack --config ./webpack.config.cjs --watch\"",
     "release": "node ./scripts/release.js",
-    "release:safe": "node ./scripts/release.js --safety"
+    "release:safe": "node ./scripts/release.js --safety",
+    "release:chat": "node ./scripts/release.js --chat",
+    "release:safe:chat": "node ./scripts/release.js --safety --chat"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [

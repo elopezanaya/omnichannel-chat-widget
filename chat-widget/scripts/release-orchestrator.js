@@ -8,6 +8,7 @@ import readline from "readline";
 const args = process.argv.slice(2);
 const SAFETY_MODE = args.includes("--safety");
 const HELP_MODE = args.includes("--help") || args.includes("-h");
+const CHAT_MODE = args.includes("--chat"); // New flag for chat-based interaction
 
 class ReleaseOrchestrator {
     constructor() {
@@ -30,7 +31,8 @@ class ReleaseOrchestrator {
             upstream: "upstream", // Default upstream remote name
             mainBranch: "main", // Default main branch name
             changelogPath: "../CHANGE_LOG.md", // Path to the CHANGELOG at the root
-            safetyMode: SAFETY_MODE
+            safetyMode: SAFETY_MODE,
+            chatMode: CHAT_MODE
         };
     }
 
@@ -41,6 +43,11 @@ class ReleaseOrchestrator {
             if (this.config.safetyMode) {
                 this.printWarning("SAFETY MODE ENABLED: Critical operations will require triple confirmation");
             }
+            
+            if (CHAT_MODE) {
+                this.printInfo("CHAT MODE ENABLED: Prompts will be displayed for GitHub Copilot Chat interaction");
+                this.config.chatMode = true;
+            }
 
             // Validate environment
             await this.validateEnvironment();
@@ -50,15 +57,17 @@ class ReleaseOrchestrator {
             console.log(`${this.colors.cyan}Current package:${this.colors.reset} ${packageInfo.name}@${packageInfo.version}`);
 
             // Determine workflow
-            const workflowType = await this.promptChoice(
-                "Select workflow",
-                [
-                    "Create an official release (tag and publish)",
-                    "Prepare for next version after a release",
-                    "Complete full release cycle (both steps above)",
-                    "Create a hotfix release"
-                ]
-            );
+            const workflowPrompt = "Select workflow";
+            const workflowChoices = [
+                "Create an official release (tag and publish)",
+                "Prepare for next version after a release",
+                "Complete full release cycle (both steps above)",
+                "Create a hotfix release"
+            ];
+            
+            const workflowType = this.config.chatMode 
+                ? await this.chatPromptChoice(workflowPrompt, workflowChoices)
+                : await this.promptChoice(workflowPrompt, workflowChoices);
 
             switch (workflowType) {
                 case 0:
@@ -537,12 +546,17 @@ class ReleaseOrchestrator {
         if (!packageInfo.isPrerelease) {
             this.printWarning(`Current version ${currentVersion} is not a prerelease`);
             const suggestedNext = this.suggestNextVersion(currentVersion, false);
-            return await this.prompt("Enter release version:", suggestedNext);
+            
+            return this.config.chatMode
+                ? await this.chatPrompt("Enter release version:", suggestedNext)
+                : await this.prompt("Enter release version:", suggestedNext);
         }
 
         // If it's a prerelease, suggest the release version without prerelease identifier
         const baseVersion = currentVersion.split("-")[0];
-        return await this.prompt("Enter release version:", baseVersion);
+        return this.config.chatMode
+            ? await this.chatPrompt("Enter release version:", baseVersion)
+            : await this.prompt("Enter release version:", baseVersion);
     }
 
     suggestNextVersion(version, asPrerelease = false) {
@@ -758,6 +772,45 @@ class ReleaseOrchestrator {
 
     // Helper methods for prompts and output formatting
 
+    async chatPrompt(question, defaultValue = "") {
+        // This method simulates a chat-based prompt that could be integrated with GitHub Copilot Chat
+        console.log(`\n${this.colors.bright}${this.colors.cyan}[CHAT PROMPT] ${question}${this.colors.reset}`);
+        if (defaultValue) {
+            console.log(`${this.colors.cyan}Default: ${defaultValue}${this.colors.reset}`);
+        }
+        
+        // In a real implementation, this would connect to GitHub Copilot Chat
+        // For now, we'll still use readline for the demo
+        return this.prompt("[Chat Response]", defaultValue);
+    }
+
+    async chatPromptYesNo(question) {
+        console.log(`\n${this.colors.bright}${this.colors.cyan}[CHAT PROMPT] ${question} (yes/no)${this.colors.reset}`);
+        
+        // In a real implementation, this would connect to GitHub Copilot Chat
+        // For now, we'll still use readline for the demo
+        return this.promptYesNo("[Chat Response]");
+    }
+
+    async chatPromptChoice(question, choices) {
+        console.log(`\n${this.colors.bright}${this.colors.cyan}[CHAT PROMPT] ${question}${this.colors.reset}`);
+        choices.forEach((choice, index) => {
+            console.log(`${this.colors.cyan}  ${index + 1}. ${choice}${this.colors.reset}`);
+        });
+        
+        // In a real implementation, this would connect to GitHub Copilot Chat
+        // For now, we'll use readline for the demo
+        const answer = await this.prompt("[Chat Response (number)]");
+        const choice = parseInt(answer) - 1;
+
+        if (isNaN(choice) || choice < 0 || choice >= choices.length) {
+            this.printError("Invalid choice");
+            return this.chatPromptChoice(question, choices);
+        }
+
+        return choice;
+    }
+
     prompt(question, defaultValue = "") {
         return new Promise((resolve) => {
             const defaultText = defaultValue ? ` (${defaultValue})` : "";
@@ -783,16 +836,18 @@ class ReleaseOrchestrator {
         this.printWarning(`SAFETY CHECK: You are about to ${action}`);
         this.printWarning("This action could affect your repository state");
         
+        const promptMethod = this.config.chatMode ? this.chatPromptYesNo.bind(this) : this.promptYesNo.bind(this);
+        
         // First confirmation
-        let confirm = await this.promptYesNo(`Are you SURE you want to ${action}? (1/3)`);
+        let confirm = await promptMethod(`Are you SURE you want to ${action}? (1/3)`);
         if (!confirm) return false;
         
         // Second confirmation
-        confirm = await this.promptYesNo(`Please confirm again that you want to ${action}? (2/3)`);
+        confirm = await promptMethod(`Please confirm again that you want to ${action}? (2/3)`);
         if (!confirm) return false;
         
         // Third confirmation
-        confirm = await this.promptYesNo(`FINAL CONFIRMATION: ${action}? (3/3)`);
+        confirm = await promptMethod(`FINAL CONFIRMATION: ${action}? (3/3)`);
         return confirm;
     }
 
@@ -848,6 +903,7 @@ Usage: node release-orchestrator.js [options]
 Options:
   --help, -h     Show this help message
   --safety       Enable safety mode (requires triple confirmation for critical actions)
+  --chat         Enable chat-based interaction (experimental)
 
 Description:
   The release orchestrator guides you through different release workflows:
@@ -858,6 +914,8 @@ Description:
 
   Safety mode will require triple confirmation for critical operations
   like tag creation and pushing to remote repositories.
+
+  Chat-based interaction is experimental and may not support all features.
 `);
 } else {
     const orchestrator = new ReleaseOrchestrator();
