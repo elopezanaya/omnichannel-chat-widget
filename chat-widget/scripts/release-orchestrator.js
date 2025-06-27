@@ -191,9 +191,8 @@ class ReleaseOrchestrator {
             
             // Add package.json and yarn.lock (this project uses yarn)
             execSync("git add package.json", { stdio: "inherit" });
-            if (fs.existsSync("./yarn.lock")) {
-                execSync("git add yarn.lock", { stdio: "inherit" });
-            }
+            
+            
             execSync(`git commit -m "Release v${releaseVersion}"`, { stdio: "inherit" });
         } catch (error) {
             throw new Error(`Failed to update version: ${error.message}`);
@@ -290,9 +289,18 @@ class ReleaseOrchestrator {
             
             // Add package.json and yarn.lock (this project uses yarn)
             execSync("git add package.json", { stdio: "inherit" });
+            
+            // Check for yarn.lock in both current directory and parent directory
             if (fs.existsSync("./yarn.lock")) {
                 execSync("git add yarn.lock", { stdio: "inherit" });
+                this.printInfo("Added yarn.lock from current directory");
             }
+            
+            if (fs.existsSync("../yarn.lock")) {
+                execSync("git add ../yarn.lock", { stdio: "inherit" });
+                this.printInfo("Added yarn.lock from parent directory (chat-widget level)");
+            }
+            
             execSync(`git commit -m "Bump version to ${nextVersion}"`, { stdio: "inherit" });
         } catch (error) {
             throw new Error(`Failed to update version: ${error.message}`);
@@ -361,15 +369,24 @@ class ReleaseOrchestrator {
         try {
             execSync(`yarn version --new-version ${confirmedVersion} --no-git-tag-version`, { stdio: "inherit" });
             
-            // Run yarn install to update dependencies and yarn.lock
-            this.printInfo("Running yarn install to update dependencies...");
-            execSync("yarn install", { stdio: "inherit" });
+            // Run yarn install to update dependencies and yarn.lock at the chat-widget level
+            this.printInfo("Running yarn install to update dependencies at chat-widget level...");
+            execSync("cd .. && yarn install", { stdio: "inherit" });
             
             // Add package.json and yarn.lock (this project uses yarn)
             execSync("git add package.json", { stdio: "inherit" });
+            
+            // Check for yarn.lock in both current directory and parent directory
             if (fs.existsSync("./yarn.lock")) {
                 execSync("git add yarn.lock", { stdio: "inherit" });
+                this.printInfo("Added yarn.lock from current directory");
             }
+            
+            if (fs.existsSync("../yarn.lock")) {
+                execSync("git add ../yarn.lock", { stdio: "inherit" });
+                this.printInfo("Added yarn.lock from parent directory (chat-widget level)");
+            }
+            
             execSync(`git commit -m "Hotfix v${confirmedVersion}"`, { stdio: "inherit" });
         } catch (error) {
             throw new Error(`Failed to update version: ${error.message}`);
@@ -428,33 +445,15 @@ class ReleaseOrchestrator {
         this.printStep(`Updating CHANGELOG for version ${version}`);
 
         if (!fs.existsSync(this.config.changelogPath)) {
-            this.printWarning(`CHANGELOG not found at ${this.config.changelogPath}`);
-            const createChangelog = await this.promptYesNo("Create a new CHANGE_LOG.md?");
-            if (createChangelog) {
-                try {
-                    // Make sure parent directory exists
-                    const dirPath = require('path').dirname(this.config.changelogPath);
-                    if (!fs.existsSync(dirPath)) {
-                        fs.mkdirSync(dirPath, { recursive: true });
-                        this.printInfo(`Created directory: ${dirPath}`);
-                    }
-                    
-                    const initialContent = `# Changelog\n\n## ${version} (${new Date().toISOString().split("T")[0]})\n\n`;
-                    fs.writeFileSync(this.config.changelogPath, initialContent, "utf8");
-                    this.printInfo(`Created new CHANGE_LOG.md at ${this.config.changelogPath}`);
-                } catch (error) {
-                    this.printError(`Failed to create changelog: ${error.message}`);
-                    throw new Error(`Could not create changelog file: ${error.message}`);
-                }
-            } else {
-                this.printInfo("Skipping CHANGELOG update");
-                return;
-            }
+            this.printError(`CHANGELOG file not found at configured path: ${this.config.changelogPath}`);
+            throw new Error(`CHANGELOG file not found at configured path: ${this.config.changelogPath}`);
         }
+        
 
         // Open the changelog in editor or provide guidance
         this.printInfo(`Please update ${this.config.changelogPath} for version ${version}`);
-        this.printInfo("Add a new section at the top of the file:");
+        this.printInfo(" Make sure to run `git add` on the file after editing it.");
+        this.printInfo("Replace [Unreleased] with the version number and date.");
         console.log(`## ${version} (${new Date().toISOString().split("T")[0]})\n`);
 
         if (isHotfix) {
@@ -623,19 +622,41 @@ class ReleaseOrchestrator {
         
         // 2. Show yarn.lock (full content if possible)
         this.printInfo(`YARN.LOCK in tag ${tagName}:`);
+        let yarnLockFound = false;
+        
         try {
-            // First try to get full content
+            // First try current directory yarn.lock
             console.log("\n");
             const yarnLockSuccess = await this.showFileDiffInTag(tagName, "yarn.lock");
             
-            if (!yarnLockSuccess) {
-                // Fall back to diff stats if full content fails
-                this.printInfo(`Showing yarn.lock changes in tag ${tagName} (summary only):`);
-                console.log("\n");
-                execSync(`git --no-pager diff --stat ${tagName}~ ${tagName} -- yarn.lock`, { stdio: "inherit" });
-                console.log("\n");
+            if (yarnLockSuccess) {
+                yarnLockFound = true;
+                this.printSuccess("yarn.lock found in tag (current directory)");
+            } else {
+                // Try parent directory yarn.lock
+                this.printInfo(`Checking for yarn.lock at chat-widget level in tag ${tagName}...`);
+                const parentYarnLockSuccess = await this.showFileDiffInTag(tagName, "../yarn.lock");
+                
+                if (parentYarnLockSuccess) {
+                    yarnLockFound = true;
+                    this.printSuccess("yarn.lock found in tag (chat-widget level)");
+                } else {
+                    // Fall back to diff stats if full content fails
+                    this.printInfo(`Showing yarn.lock changes in tag ${tagName} (summary only):`);
+                    console.log("\n");
+                    try {
+                        execSync(`git --no-pager diff --stat ${tagName}~ ${tagName} -- yarn.lock ../yarn.lock`, { stdio: "inherit" });
+                        console.log("\n");
+                    } catch (error) {
+                        this.printWarning(`Could not get yarn.lock diff stats: ${error.message}`);
+                    }
+                }
             }
         } catch (error) {
+            this.printError("Could not verify yarn.lock in tag!");
+        }
+        
+        if (!yarnLockFound) {
             this.printError("CRITICAL: yarn.lock is not in the tag!");
         }
         
@@ -649,7 +670,7 @@ class ReleaseOrchestrator {
         }
         
         // Summary
-        if (packageJsonSuccess && changelogSuccess) {
+        if (packageJsonSuccess && changelogSuccess && yarnLockFound) {
             this.printSuccess("All critical files are present in the tag!");
         } else {
             this.printWarning("Some critical files may be missing from the tag!");
@@ -684,16 +705,37 @@ class ReleaseOrchestrator {
         }
         
         // 3. Verify yarn.lock is committed
+        let yarnLockCommitted = false;
+        
+        // Check current directory
         if (fs.existsSync("./yarn.lock")) {
-            this.printInfo("Verifying yarn.lock is committed...");
+            this.printInfo("Verifying yarn.lock in current directory is committed...");
             try {
                 execSync("git show HEAD:yarn.lock > /dev/null", { stdio: "ignore" });
+                yarnLockCommitted = true;
+                this.printSuccess("yarn.lock in current directory is committed");
             } catch (error) {
-                this.printError("yarn.lock is not in the latest commit!");
-                const forceContinue = await this.promptYesNo("Continue without yarn.lock in the commit? (Not recommended)");
-                if (!forceContinue) {
-                    throw new Error("yarn.lock must be committed before creating a tag");
-                }
+                this.printWarning("yarn.lock in current directory is not in the latest commit!");
+            }
+        }
+        
+        // Check parent directory (chat-widget level)
+        if (fs.existsSync("../yarn.lock")) {
+            this.printInfo("Verifying yarn.lock at chat-widget level is committed...");
+            try {
+                execSync("git show HEAD:../yarn.lock > /dev/null", { stdio: "ignore" });
+                yarnLockCommitted = true;
+                this.printSuccess("yarn.lock at chat-widget level is committed");
+            } catch (error) {
+                this.printWarning("yarn.lock at chat-widget level is not in the latest commit!");
+            }
+        }
+        
+        if (!yarnLockCommitted) {
+            this.printError("No yarn.lock file is committed in either directory!");
+            const forceContinue = await this.promptYesNo("Continue without yarn.lock in the commit? (Not recommended)");
+            if (!forceContinue) {
+                throw new Error("yarn.lock must be committed before creating a tag");
             }
         }
         

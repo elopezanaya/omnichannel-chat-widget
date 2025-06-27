@@ -130,7 +130,9 @@
     "pretest:visual": "yarn playwright install",
     "prepare": "husky",
     "clean": "rimraf lib",
-    "dev": "concurrently \"yarn build:esm:watch\" \"webpack --config ./webpack.config.cjs --watch\""
+    "dev": "concurrently \"yarn build:esm:watch\" \"webpack --config ./webpack.config.cjs --watch\"",
+    "release": "node ./scripts/release.js",
+    "release:safe": "node ./scripts/release.js --safety"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [
