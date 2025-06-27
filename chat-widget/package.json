@@ -119,6 +119,8 @@
     "build:esm:watch": "babel ./src --config-file ./babel.esm.config.json --out-dir lib/esm --extensions .ts,.js,.tsx --watch --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx",
     "build:cjs:watch": "babel ./src --config-file ./babel.config.json --out-dir lib/cjs --extensions .ts,.js,.tsx --watch --ignore **/*.test.ts,**/*.stories.tsx,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx",
     "build:umd": "webpack --config ./webpack.umd.config.cjs",
+    "release": "node scripts/release.js",
+    "release:safe": "node scripts/release.js --safety",
     "verify": "yarn install && yarn build-storybook && yarn test:all && yarn build && yarn storybook",
     "testpack": "yarn build && yarn pack",
     "build-sample": "yarn build && webpack --config ./webpack.config.cjs",
