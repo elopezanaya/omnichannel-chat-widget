@@ -2,8 +2,8 @@ import { ConversationState } from "../contexts/common/ConversationState";
 import { ILiveChatWidgetContext } from "../contexts/common/ILiveChatWidgetContext";
 
 export const shouldShowChatButton = (state: ILiveChatWidgetContext) => {
-    const isMinimized = state.appStates.isMinimized;
-    const conversationState = state.appStates.conversationState;
+    const isMinimized = state?.appStates?.isMinimized;
+    const conversationState = state?.appStates?.conversationState;
     const hideStartChatButton = state?.appStates?.hideStartChatButton;
     
     console.log("[CHAT_BUTTON] Values:", { isMinimized, conversationState, hideStartChatButton });
