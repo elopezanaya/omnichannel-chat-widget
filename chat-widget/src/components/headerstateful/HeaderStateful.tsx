@@ -35,7 +35,7 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
     const [adapter,]: [any, (adapter: any) => void] = useChatAdapterStore();
     const { headerProps, outOfOfficeHeaderProps, endChat } = props;
     //Setting OutOfOperatingHours Flag
-    const [outOfOperatingHours, setOutOfOperatingHours] = useState(state.appStates.outsideOperatingHours);
+    const [outOfOperatingHours, setOutOfOperatingHours] = useState(false);
 
     const outOfOfficeStyleProps: IHeaderStyleProps = Object.assign({}, defaultOutOfOfficeHeaderStyleProps, outOfOfficeHeaderProps?.styleProps);
 
@@ -117,10 +117,6 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
         hideCloseButton: state.appStates.conversationState === ConversationState.OutOfOffice || outOfOfficeHeaderProps?.controlProps?.hideCloseButton
     };
 
-    useEffect(() => {        
-        setOutOfOperatingHours(state.appStates.outsideOperatingHours);
-    }, []);
-
     useEffect(() => {
         localConfirmationPaneState.current = state?.domainStates?.confirmationState;
     }, [state?.domainStates?.confirmationState]);
@@ -137,6 +133,14 @@ export const HeaderStateful = (props: IHeaderStatefulParams) => {
             ElapsedTimeInMilliseconds: uiTimer.milliSecondsElapsed
         });
     }, []);
+
+    useEffect(() => {
+       if (state.appStates.conversationState === ConversationState.Closed) {   
+            // If the conversation state is closed, check if we are outside operating hours
+            const isOutsideOperatingHours = state.appStates.outsideOperatingHours;
+            setOutOfOperatingHours(isOutsideOperatingHours);
+        }      
+    }, [state.appStates.conversationState]);
 
     if (props.draggable === true) {
         const styleProps = (outOfOperatingHours || state.appStates.conversationState === ConversationState.OutOfOffice) ? outOfOfficeStyleProps : headerProps?.styleProps;

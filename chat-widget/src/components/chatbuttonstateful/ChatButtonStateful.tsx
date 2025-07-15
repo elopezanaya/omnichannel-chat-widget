@@ -34,7 +34,7 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
     const { buttonProps, outOfOfficeButtonProps, startChat } = props;
     //Setting OutOfOperatingHours Flag
     //Setting OutOfOperatingHours Flag - to string conversion to normalize the value (could be boolean from other states or string directly from config)
-    const [outOfOperatingHours, setOutOfOperatingHours] = useState(state.appStates.outsideOperatingHours);
+    const [outOfOperatingHours, setOutOfOperatingHours] = useState(false);
     
     // Create a memoized click handler function instead of using useRef
     const handleChatButtonClick = useRef(async () => {
@@ -91,7 +91,6 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
     };
 
     useEffect(() => {
-        setOutOfOperatingHours(state.appStates.outsideOperatingHours);
         // Access runtime ID at the time this effect runs
         const runtimeId = TelemetryManager?.InternalTelemetryData?.lcwRuntimeId;
         console.log("LCW Button Show:", runtimeId);
@@ -112,9 +111,17 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
             Event: TelemetryEvent.UXLCWChatButtonLoadingCompleted,
             Description: "Chat button loading completed",
             ElapsedTimeInMilliseconds: uiTimer.milliSecondsElapsed
-        });
-
+        }); 
     }, []);
+
+    useEffect(() => {
+        if (state.appStates.conversationState === ConversationState.Closed) {   
+            // If the conversation state is closed, check if we are outside operating hours
+            const isOutsideOperatingHours = state.appStates.outsideOperatingHours;
+            setOutOfOperatingHours(isOutsideOperatingHours);
+        }     
+    }, [state.appStates.conversationState]);
+
 
     return (
         <ChatButton
