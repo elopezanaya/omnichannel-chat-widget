@@ -90,7 +90,8 @@ export const shouldShowWebChatContainer = (state: ILiveChatWidgetContext) => {
     });
     
     const result = ((!isMinimized) && conversationState === ConversationState.Active ||
-        conversationState === ConversationState.InActive);
+        conversationState === ConversationState.InActive ||
+        (state.appStates.conversationState === ConversationState.Postchat && state.appStates.isConversationalSurveyEnabled && state.appStates.isConversationalSurvey));
     
     console.log("[WEBCHAT] Result:", result);
     return result;
@@ -215,7 +216,7 @@ export const shouldShowPostChatSurveyPane = (state: ILiveChatWidgetContext) => {
         isPostchat: conversationState === ConversationState.Postchat
     });
     
-    const result = conversationState === ConversationState.Postchat;
+    const result = (conversationState === ConversationState.Postchat) && !state.appStates.isConversationalSurvey;
     
     console.log("[POSTCHAT_SURVEY] Result:", result);
     return result;
