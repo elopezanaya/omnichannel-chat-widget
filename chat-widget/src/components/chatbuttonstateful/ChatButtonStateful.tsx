@@ -73,10 +73,6 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
         subtitleText: "We're online.",
         hideNotificationBubble: buttonProps?.controlProps?.hideNotificationBubble === true || state.appStates.isMinimized === false,
         unreadMessageCount: state.appStates.unreadMessageCount ? (state.appStates.unreadMessageCount > Constants.maximumUnreadMessageCount ? props.buttonProps?.controlProps?.largeUnreadMessageString : state.appStates.unreadMessageCount.toString()) : "0",
-<<<<<<< HEAD
-        onClick: handleChatButtonClick,
-=======
->>>>>>> origin/main
         unreadMessageString: props.buttonProps?.controlProps?.unreadMessageString,
         // Regular chat button onClick - this will always take precedence
         onClick: () => ref.current()
