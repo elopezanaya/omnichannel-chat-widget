@@ -150,20 +150,11 @@ export class Constants {
 }
 
 export const Regex = class {
-<<<<<<< HEAD
-    // Simple, practical email validation that covers 99.9% of real-world cases
-    // Handles both uppercase and lowercase characters automatically
-    public static readonly EmailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-    
-    // Alternative: More permissive version if the above is too strict
-    // public static readonly EmailRegex = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
-=======
     // ReDoS-safe email validation strictly following RFC 5322
     // Safe against exponential backtracking attacks through linear pattern structure
     // Supports: quoted local parts, RFC 5322 valid special characters, IP addresses, single-label domains
     // Complies with RFC 5322 standard (allows user@domain without TLD)
     public static readonly EmailRegex = "^(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\")@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\])$";
->>>>>>> origin/main
 };
 
 export class HtmlIdNames {
