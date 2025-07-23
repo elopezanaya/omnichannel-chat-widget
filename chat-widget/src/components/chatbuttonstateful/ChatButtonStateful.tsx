@@ -34,15 +34,6 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
     const { buttonProps, outOfOfficeButtonProps, startChat } = props;
     //Setting OutOfOperatingHours Flag
     //Setting OutOfOperatingHours Flag - to string conversion to normalize the value (could be boolean from other states or string directly from config)
-<<<<<<< HEAD
-    const [outOfOperatingHours, setOutOfOperatingHours] = useState(false);
-    
-    // Create a memoized click handler function instead of using useRef
-    const handleChatButtonClick = useRef(async () => {
-        // Get the runtime ID at the time of the click, not when the component renders
-        const runtimeId = TelemetryManager?.InternalTelemetryData?.lcwRuntimeId;
-        console.log("Chat button clicked=>", runtimeId);
-=======
     // Initialize with the current state value to prevent visual flicker
     const [outOfOperatingHours, setOutOfOperatingHours] = useState(() => {
         return state.appStates.conversationState === ConversationState.Closed && state.appStates.outsideOperatingHours;
@@ -50,12 +41,9 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
     const ref = useRef(() => {return;});
 
     ref.current = async () => {
-
->>>>>>> origin/main
         TelemetryHelper.logActionEventToAllTelemetry(LogLevel.INFO, {
             Event: TelemetryEvent.LCWChatButtonClicked,
-            Description: "Chat button click action started",
-            runtimeId: runtimeId
+            Description: "Chat button click action started"
         });
         
         if (state.appStates.isMinimized) {
@@ -73,7 +61,7 @@ export const ChatButtonStateful = (props: IChatButtonStatefulParams) => {
             Event: TelemetryEvent.LCWChatButtonActionCompleted,
             Description: "Chat button action completed"
         });
-    }).current;
+    };
 
     const outOfOfficeStyleProps: IChatButtonStyleProps = Object.assign({}, defaultOutOfOfficeChatButtonStyleProps, outOfOfficeButtonProps?.styleProps);
     
