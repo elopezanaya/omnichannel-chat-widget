@@ -42,7 +42,7 @@ const prepareEndChat = async (props: ILiveChatWidgetProps, facadeChatSDK: Facade
             }
 
             // Use Case: If ended by Agent, stay chat in InActive state
-            let isConversationalSurveyEnabled = state.appStates.isConversationalSurveyEnabled;
+            const isConversationalSurveyEnabled = state.appStates.isConversationalSurveyEnabled;
             if (isConversationalSurveyEnabled && (state?.appStates?.conversationEndedBy === ConversationEndEntity.Agent ||
                 state?.appStates?.conversationEndedBy === ConversationEndEntity.Bot)) {
                 dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_STATE, payload: ConversationState.InActive });
@@ -137,6 +137,9 @@ const endChat = async (props: ILiveChatWidgetProps, facadeChatSDK: any, state: I
     skipEndChatSDK?: boolean, skipCloseChat?: boolean, postMessageToOtherTab?: boolean) => {
 
     if (!skipEndChatSDK && facadeChatSDK?.getChatSDK()?.conversation) {
+
+        console.warn("Ending chat session");
+
         const inMemoryState = executeReducer(state, { type: LiveChatWidgetActionType.GET_IN_MEMORY_STATE, payload: null });
         const endChatOptionalParameters : EndChatOptionalParams = {
             isSessionEnded : inMemoryState?.appStates?.chatDisconnectEventReceived
@@ -175,6 +178,7 @@ const endChat = async (props: ILiveChatWidgetProps, facadeChatSDK: any, state: I
 
     if (!skipCloseChat) {
         try {
+            console.warn("Closing chat session");
             adapter?.end();
             setAdapter(undefined);
             setWebChatStyles({ ...defaultWebChatContainerStatefulProps.webChatStyles, ...props.webChatContainerProps?.webChatStyles });

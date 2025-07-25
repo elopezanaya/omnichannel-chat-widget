@@ -73,6 +73,7 @@ import { StartChatFailureType } from "../../../contexts/common/StartChatFailureT
 import StartChatOptionalParams from "@microsoft/omnichannel-chat-sdk/lib/core/StartChatOptionalParams";
 import { TelemetryHelper } from "../../../common/telemetry/TelemetryHelper";
 import WebChatContainerStateful from "../../webchatcontainerstateful/WebChatContainerStateful";
+import construct from "core-js/fn/reflect/construct";
 import createDownloadTranscriptProps from "../common/createDownloadTranscriptProps";
 import { createFooter } from "../common/createFooter";
 import { createInternetConnectionChangeHandler } from "../common/createInternetConnectionChangeHandler";
@@ -98,6 +99,7 @@ let uiTimer : ITimer;
 export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     useEffect(() => {
+        console.log("[LiveChatWidgetStateful] Subscription useEffect mounted");
         uiTimer = createTimer();
         TelemetryHelper.logLoadingEventToAllTelemetry(LogLevel.INFO, {
             Event: TelemetryEvent.UXLiveChatWidgetStart,
@@ -297,6 +299,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
 
     // useEffect for custom context
     useEffect(() => {
+        console.log("[LiveChatWidgetStateful] BroadcastService subscription useEffect mounted");
         // Add the custom context on receiving the SetCustomContext event
         BroadcastService.getMessageByEventName(BroadcastEvent.SetCustomContext).subscribe((msg: ICustomEvent) => {
             TelemetryHelper.logActionEvent(LogLevel.INFO, {
@@ -458,29 +461,49 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
                 Description: "Received InitiateEndChat BroadcastEvent."
             });
 
+            const inMemoryState = executeReducer(state, { type: LiveChatWidgetActionType.GET_IN_MEMORY_STATE, payload: null });
+            console.error("{LOPEZ20}InMemory :: End chat initiated from BroadcastEvent.InitiateEndChat", inMemoryState.appStates.conversationState);
+            console.error("{LOPEZ}state :: End chat initiated from BroadcastEvent.InitiateEndChat", state.appStates.conversationState);
+
+            if (inMemoryState.appStates.conversationState === ConversationState.Postchat) {
+                
+                dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_STATE, payload: ConversationState.ClosingChat });
+
+                const skipCloseChat = false;
+                const skipEndChatSDK = true; // We are not calling endChatSDK here, as we are already in post chat state
+                const postMessageToOtherTab = true; // We need to post message to other tabs
+
+                await endChat(props, facadeChatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, skipEndChatSDK, skipCloseChat, postMessageToOtherTab);
+
+
+                return;
+            }
+
             // displaying closing pane and then let closing chat flow to continue
             dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_STATE, payload: ConversationState.ClosingChat });
-
+            
             // This is to ensure to get latest state from cache in multitab
             const persistedState = getStateFromCache(getWidgetCacheIdfromProps(props));
 
             if (persistedState &&
                 persistedState.appStates.conversationState === ConversationState.Active) {
-
-                // We need to simulate states for closing chat, in order to messup with close confirmation pane.
+                // We need to simulate states for closing chat, in order to mess up with close confirmation pane.
+                dispatch({ type: LiveChatWidgetActionType.SET_CONFIRMATION_STATE, payload: ConfirmationState.Ok });
+                dispatch({ type: LiveChatWidgetActionType.SET_SHOW_CONFIRMATION, payload: false });
+                dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_ENDED_BY, payload: ConversationEndEntity.Customer });
+            } else {
+                
+                console.warn(state.appStates.conversationState, "{LOPEZ} Conversation state is not active, so we cannot end the chat.");
+                // If not active, we need to end the chat
+                dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_ENDED_BY, payload: ConversationEndEntity.Customer });
                 dispatch({ type: LiveChatWidgetActionType.SET_CONFIRMATION_STATE, payload: ConfirmationState.Ok });
                 dispatch({ type: LiveChatWidgetActionType.SET_SHOW_CONFIRMATION, payload: false });
 
-                dispatch({ type: LiveChatWidgetActionType.SET_CONVERSATION_ENDED_BY, payload: ConversationEndEntity.Customer });
-                
-            } else {
-                const skipEndChatSDK = true;
-                const skipCloseChat = false;
+                // Align parameters with header close flow: skipEndChatSDK = true, skipCloseChat = false, postMessageToOtherTab = true
                 TelemetryHelper.logSDKEvent(LogLevel.INFO, {
                     Event: TelemetryEvent.PrepareEndChat,
                     Description: PrepareEndChatDescriptionConstants.InitiateEndChatReceived
                 });
-                endChat(props, facadeChatSDK, state, dispatch, setAdapter, setWebChatStyles, adapter, skipEndChatSDK, skipCloseChat);
             }
 
             BroadcastService.postMessage({
@@ -659,8 +682,7 @@ export const LiveChatWidgetStateful = (props: ILiveChatWidgetProps) => {
             return;
         }
 
-        const inMemoryState = executeReducer(state, { type: LiveChatWidgetActionType.GET_IN_MEMORY_STATE, payload: null });
-        let isConversationalSurveyEnabled = state.appStates.isConversationalSurveyEnabled;
+        const isConversationalSurveyEnabled = state.appStates.isConversationalSurveyEnabled;
 
         // In conversational survey, we need to check post chat survey logics before we set ConversationState to InActive
         // Hence setting ConversationState to InActive will be done later in the post chat flows
