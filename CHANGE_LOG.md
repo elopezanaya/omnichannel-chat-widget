@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Enabling capture of conversationId in telemetry as soon as its obtained.
 - Adding Citation Handler to support citation pane rendering in chat widget.
 - Adding runtimeId as part of events send to identify calls from different tabs.
 - Masking custom properties for message event telemetry

@@ -27,7 +27,7 @@ const updateSessionDataForTelemetry = async (facadeChatSDK: FacadeChatSDK, dispa
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const updateConversationDataForTelemetry = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<ILiveChatWidgetAction>) => {
+export const updateConversationDataForTelemetry = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<ILiveChatWidgetAction>) => {
     if (facadeChatSDK && facadeChatSDK.getChatSDK()) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const liveWorkItem: any = await getConversationDetailsCall(facadeChatSDK);
