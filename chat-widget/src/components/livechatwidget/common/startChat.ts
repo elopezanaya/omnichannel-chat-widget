@@ -4,7 +4,6 @@ import { TelemetryManager, TelemetryTimers } from "../../../common/telemetry/Tel
 import { checkContactIdError, createTimer, getConversationDetailsCall, getStateFromCache, getWidgetCacheIdfromProps, isNullOrEmptyString, isNullOrUndefined, isUndefinedOrEmpty } from "../../../common/utils";
 import { handleChatReconnect, isPersistentEnabled, isReconnectEnabled } from "./reconnectChatHelper";
 import { handleStartChatError, logWidgetLoadComplete } from "./startChatErrorHandler";
-import { updateConversationDataForTelemetry, updateTelemetryData } from "./updateSessionDataForTelemetry";
 
 import { ActivityStreamHandler } from "./ActivityStreamHandler";
 import { BroadcastService } from "@microsoft/omnichannel-chat-components";
@@ -24,6 +23,7 @@ import { createTrackingForFirstMessage } from "../../../firstresponselatency/Fir
 import { isPersistentChatEnabled } from "./liveChatConfigUtils";
 import { setPostChatContextAndLoadSurvey } from "./setPostChatContextAndLoadSurvey";
 import { shouldSetPreChatIfPersistentChat } from "./persistentChatHelper";
+import { updateConversationDataForTelemetry } from "./updateSessionDataForTelemetry";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let optionalParams: StartChatOptionalParams = {};
@@ -183,6 +183,10 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
             createTrackingForFirstMessage();
             await facadeChatSDK.startChat(startChatOptionalParams);
             isStartChatSuccessful = true;
+            
+            // Update conversationId immediately after startChat succeeds, before creating adapter
+            await updateConversationDataForTelemetry(facadeChatSDK, dispatch);
+            
             await createAdapterAndSubscribe(facadeChatSDK, dispatch, setAdapter, startTime, props);
 
         } catch (error) {
@@ -207,10 +211,6 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
 
         // Set app state to Active
         if (isStartChatSuccessful) {
-            
-            // update conversationId as soon as the chat is started
-            await updateConversationDataForTelemetry(facadeChatSDK, dispatch);
-            
             ActivityStreamHandler.uncork();
             // Update start chat failure app state if chat loads successfully
             dispatch({ type: LiveChatWidgetActionType.SET_START_CHAT_FAILING, payload: false });
@@ -236,8 +236,6 @@ const initStartChat = async (facadeChatSDK: FacadeChatSDK, dispatch: Dispatch<IL
         logWidgetLoadComplete();
         // Set post chat context in state, load in background to do not block the load
         setPostChatContextAndLoadSurvey(facadeChatSDK, dispatch);
-        // Updating chat session detail for telemetry
-        await updateTelemetryData(facadeChatSDK, dispatch);
     } catch (ex) {
         handleStartChatError(dispatch, facadeChatSDK, props, ex, isStartChatSuccessful);
     } finally {
